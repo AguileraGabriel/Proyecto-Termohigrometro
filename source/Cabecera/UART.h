@@ -22,13 +22,7 @@
 //---------------------------------------------------------------//
 
 
-//---------------------------------------------------------------//
-// Variables
-//---------------------------------------------------------------//
-uint8_t flagReceived = 0, dataUsart;
 
-char buffer[64]; //Buffer donde cargo la informacion a enviar por USART.
-char newline []="\r\n"; //Buffer para realizar un salto de linea.
 
 //---------------------------------------------------------------//
 // Prototipos
