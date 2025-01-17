@@ -57,7 +57,7 @@ void Init_UART(void){
 	NVIC_EnableIRQ(USART1_IRQn);
 
 	//Escribo para verificar la conexión
-	//USART_WriteByte(USART1, 0x31);
+	USART_WriteByte(USART1, 0x31);
 	return;
 }
 

@@ -14,6 +14,7 @@
 #include "fsl_swm.h"
 #include "pin_mux.h"
 #include <stdbool.h>
+#include <stdio.h>
 
 //---------------------------------------------------------------//
 
@@ -32,7 +33,7 @@
  * Inicializo UART en los pines 25 y 24, los cuales pueden ser modificados
  * La configuracion del UART es por defecto
  */
-void UART_Init(void);
+void Init_UART(void);
 
 /*Transmito por USART
  *
@@ -42,7 +43,7 @@ void UART_Init(void);
  *
  */
 
-void UART_Send(USART_Type *base, uint8_t data, char texto);
+void Send_USART(USART_Type *base, uint8_t data, char texto);
 
 
 /*

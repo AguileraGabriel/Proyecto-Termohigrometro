@@ -15,7 +15,7 @@
 
 
 // Dirección I2C del SHT30 (ajustar según configuración del sensor)
-#define SHT30_I2C_ADDRESS 0x44
+#define SHT30_I2C_ADDRESS 0x45
 
 // Comandos del SHT30
 #define SHT30_CMD_MEASURE_HIGHREP 0x2400  // Alta repetibilidad
@@ -25,6 +25,7 @@
 typedef struct {
     float temperature;
     float humidity;
+    float dewpoint;
 } sht30_data_t;
 
 // Función para inicializar el sensor

@@ -62,3 +62,11 @@ status_t SHT30_SoftReset(I2C_Type *base) {
     return SHT30_WriteCommand(base, SHT30_CMD_SOFT_RESET);
 }
 
+// Calcular el punto de rocío
+float SHT30_CalculateDewPoint(float temperature, float humidity) {
+    const float A = 17.27;
+    const float B = 237.7;
+    float alpha = (A * temperature) / (B + temperature) + log(humidity / 100.0);
+    return (B * alpha) / (A - alpha);
+}
+
