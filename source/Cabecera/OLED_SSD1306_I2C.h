@@ -224,7 +224,12 @@ void OLED_Set_Text (uint8_t X_axis, uint8_t Y_axis, uint8_t SC, char* String, ui
  */
 void OLED_Fill_Rect (uint8_t X_axis, uint8_t Y_axis, uint8_t Width, uint8_t Height, uint8_t SC);
 
+
 void OLED_Copy_Image(const uint8_t *Img, uint16_t size);
+
+
+void OLED_Draw_Logo(const uint8_t *bitmap, uint8_t width, uint8_t height, uint8_t x, uint8_t y);
+
 
 
 

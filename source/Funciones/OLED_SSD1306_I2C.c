@@ -313,3 +313,55 @@ void OLED_Copy_Image(const uint8_t *Img, uint16_t size){
 		OLED_Buffer[CpyBuffer] = *(Img + CpyBuffer);
 	}
 }
+
+void OLED_Draw_Logo(const uint8_t *bitmap, uint8_t width, uint8_t height, uint8_t x, uint8_t y)
+{
+    for (uint8_t i = 0; i < height; i++)
+    {
+        for (uint8_t j = 0; j < width; j++)
+        {
+            // Calcula el bit actual
+            uint8_t byte_index = (i * (width / 8)) + (j / 8);
+            uint8_t bit_index = j % 8;
+
+            // Determina si el píxel está encendido
+            uint8_t pixel = (bitmap[byte_index] >> bit_index) & 0x01;
+
+            // Dibuja el píxel en el buffer
+            OLED_Set_Pixel(x + j, y + i, pixel ? kOLED_Pixel_Set : kOLED_Pixel_Clear);
+        }
+    }
+
+    // Refresca el display para aplicar los cambios
+    OLED_Refresh();
+}
+
+void OLED_Fill_Rect(uint8_t X_axis, uint8_t Y_axis, uint8_t Width, uint8_t Height, uint8_t SC)
+{
+    // Asegúrate de que las coordenadas estén dentro de los límites del display
+    if (X_axis >= OLED_WIDTH || Y_axis >= OLED_HEIGHT)
+    {
+        return; // Salir si está fuera de los límites
+    }
+
+    // Limita el ancho y alto al tamaño máximo del display
+    if (X_axis + Width > OLED_WIDTH)
+    {
+        Width = OLED_WIDTH - X_axis;
+    }
+
+    if (Y_axis + Height > OLED_HEIGHT)
+    {
+        Height = OLED_HEIGHT - Y_axis;
+    }
+
+    // Recorrer las filas y columnas dentro de la región especificada
+    for (uint8_t y = Y_axis; y < Y_axis + Height; y++)
+    {
+        for (uint8_t x = X_axis; x < X_axis + Width; x++)
+        {
+            // Llamar a OLED_Set_Pixel para establecer o limpiar los píxeles
+            OLED_Set_Pixel(x, y, SC);
+        }
+    }
+}
