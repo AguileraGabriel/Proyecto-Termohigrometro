@@ -19,6 +19,8 @@
 
 // Comandos del SHT30
 #define SHT30_CMD_MEASURE_HIGHREP 0x2400  // Alta repetibilidad
+#define SHT30_CMD_MEASURE_MEDREP  0x240B  // Media repetibilidad
+#define SHT30_CMD_MEASURE_LOWREP  0x2416  // Baja repetibilidad
 #define SHT30_CMD_SOFT_RESET      0x30A2  // Reinicio del sensor
 
 // Estructura para los datos de temperatura y humedad
