@@ -30,8 +30,6 @@ char buffer3 [64];
 char LecturaADC [64];
 char mensaje [64];
 
-adc_result_info_t adcResultInfoStruct;
-int valor;
 
 
 /*****************************************
@@ -47,43 +45,40 @@ int main(void){
 
 	//Inicializaciones
 
-	//BOARD_InitDebugConsole();
+	BOARD_InitDebugConsole();
 
 	I2C_Init();
 
-	//InitADC(0,kSWM_ADC_CHN0); //Inicializo canal 0 con PIO0_07 PIN 32
-	//InitADC(1,kSWM_ADC_CHN1); //Inicializo canal 1 con PIO0_06 PIN 33
+
 	//setCurrentTime();
-	//InitADC_MultiChannel((1 << 7) | (1 << 6));
+
 	InitADC((1 << 0) | (1 << 1)); // Habilita los canales 0 y 1
+
+	OLED_Init();
+	OLED_Clear();
+	OLED_Refresh();
 
 	Init_UART();
 
+	SHT30_SoftReset(I2C1_BASE);
+
 
 	//Variables requeridas
-
 	sht30_data_t data;
 	//uint8_t hours, minutes, seconds;
 	//uint8_t day, month, year;
 	uint32_t adcResult0 = 0;
 	uint32_t adcResult1 = 0;
-	uint32_t adcValueChannel7 = 0;
-	uint32_t adcValueChannel6 = 0;
-	uint32_t result;
-
+	float temperatura = 0;
 
 
 	while (1) {
-		uint32_t statusFlags = ADC_GetStatusFlags(ADC0);
-		sprintf(mensaje, "Flags de estado del ADC: 0x%08lX\r\n", statusFlags);
-		UART_WriteString(USART1, mensaje);
+
 
 
 		// Disparar la conversión del ADC
 		ADC_StartConversion(ADC0);
-		statusFlags = ADC_GetStatusFlags(ADC0);
-		sprintf(mensaje, "Flags de estado del ADC: 0x%08lX\r\n", statusFlags);
-		UART_WriteString(USART1, mensaje);
+
 
 		// Leer el resultado de la conversión
 		if (ADC_GetChannelResult(ADC0, 0, &adcResult0)) { // Canal 0
@@ -92,28 +87,11 @@ int main(void){
 			sprintf(LecturaADC,"Esperando resultado del ADC0...\r\n");
 		}
 		UART_WriteString(USART1, LecturaADC);
-
-/*
-		// Bucle para leer los resultados de la secuencia
-		for (int i = 0; i < 8; i++) { // 8 es el número máximo de conversiones en la secuencia
-			if (ADC_GetChannelConversionResult(ADC0, i, &result)) {
-				if (i == 7) {
-					adcValueChannel7 = result;
-				} else if (i == 6) {
-					adcValueChannel6 = result;
-				}
-			}
-			//Si el valor de result no se actualiza, se ignora
-		}
-		sprintf(LecturaADC,"Canal 7: %d, Canal 6: %d\r\n", adcValueChannel7, adcValueChannel6);
-		UART_WriteString(USART1, LecturaADC);
-*/
-
-		// Disparar la conversión del ADC
-		//ADC_StartConversion(ADC0);
-		statusFlags = ADC_GetStatusFlags(ADC0);
-		sprintf(mensaje, "Flags de estado del ADC: 0x%08lX\r\n", statusFlags);
+		temperatura = ConvertADCToTemperature(adcResult0);
+		sprintf(mensaje,"Temperatura en el ADC0: %lu\r\n", (int)temperatura);
 		UART_WriteString(USART1, mensaje);
+
+		// Leo el otro ADC
 
 		// Leer el resultado de la conversión
 		if (ADC_GetChannelResult(ADC0, 1, &adcResult1)) { // Canal 1
@@ -122,7 +100,9 @@ int main(void){
 			sprintf(LecturaADC,"Esperando resultado del ADC1...\r\n");
 		}
 		UART_WriteString(USART1, LecturaADC);
-
+		temperatura = ConvertADCToTemperature(adcResult1);
+		sprintf(mensaje,"Temperatura en el ADC1: %lu\r\n", (int)temperatura);
+		UART_WriteString(USART1, mensaje);
 
 
 	    // Leer datos del SHT30
