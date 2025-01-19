@@ -11,6 +11,8 @@
 
 #include "fsl_adc.h"
 #include "fsl_iocon.h"
+#include "fsl_power.h"
+#include "fsl_swm_connections.h"
 
 // Estructura para la configuración del ADC
 typedef struct {
@@ -20,13 +22,16 @@ typedef struct {
 } my_adc_config_t;
 
 // Inicialización del ADC con ConvSeqA
-void ADCInit(my_adc_config_t *config);
+void InitADC(uint32_t channelMask);
 
 // Inicia una conversión mediante el trigger configurado
 void ADC_StartConversion(ADC_Type *base);
 
 // Obtiene el resultado de un canal específico (no bloqueante)
 bool ADC_GetChannelResult(ADC_Type *base, uint32_t channel, uint32_t *result);
+
+
+//void InitADC_MultiChannel(uint32_t channelMask);
 
 
 #endif /* CABECERA_ADC_H_ */
