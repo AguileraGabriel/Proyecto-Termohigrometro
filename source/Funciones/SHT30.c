@@ -33,7 +33,7 @@ status_t SHT30_Init(I2C_Type *base, uint32_t srcClock_Hz) {
 
 // Realizar una medición
 status_t SHT30_ReadData(I2C_Type *base, sht30_data_t *data) {
-    if (SHT30_WriteCommand(base, SHT30_CMD_MEASURE_HIGHREP) != kStatus_Success) {
+    if (SHT30_WriteCommand(base, SHT30_CMD_MEASURE_MEDREP) != kStatus_Success) {
         return kStatus_Fail;
     }
 
