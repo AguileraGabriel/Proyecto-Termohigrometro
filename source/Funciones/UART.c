@@ -82,6 +82,15 @@ void Send_USART(USART_Type *base, uint8_t data, char texto){
 }
 
 
+void UART_WriteString(USART_Type *base, const char *data) {
+    while (*data) {
+        while (!(base->STAT & USART_STAT_TXRDY_MASK)) {
+            // Esperar a que el buffer esté listo
+        }
+        USART_WriteByte(base, *data++);
+    }
+}
+
 
 //---------------------------------------------------------------//
 //Interrupción

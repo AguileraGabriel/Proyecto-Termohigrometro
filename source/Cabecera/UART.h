@@ -46,6 +46,9 @@ void Init_UART(void);
 void Send_USART(USART_Type *base, uint8_t data, char texto);
 
 
+void UART_WriteString(USART_Type *base, const char *data);
+
+
 /*
  * Si recibo informacion por USART desde la computadora, la leo y
  * almaceno en dataUsart.
