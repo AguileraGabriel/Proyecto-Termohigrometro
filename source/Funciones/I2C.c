@@ -7,7 +7,7 @@
 
 #include "../Cabecera/I2C.h"
 
-int baudRate = 4000, frequency = 50000;
+int baudRate = 50000, frequency = 1000000;
 
 /*--------------------------------------
  * I2C Initialization Function
@@ -27,3 +27,8 @@ void I2C_Init(void) {
     I2C_MasterInit(I2C1_BASE, &masterConfig, frequency);
 }
 
+void I2C_ResetBus(I2C_Type *base) {
+    if (I2C_GetStatusFlags(base) & 0x3U) {
+        I2C_MasterReset(base); // Forzar un STOP en el bus
+    }
+}

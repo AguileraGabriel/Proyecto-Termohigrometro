@@ -22,5 +22,7 @@
 
 void I2C_Init(void);
 
+void I2C_ResetBus(I2C_Type *base);
+
 
 #endif /* CABECERA_I2C_H_ */
