@@ -57,12 +57,13 @@ status_t DS1307_WriteRegister(uint8_t reg, uint8_t value) {
         printf("I2C Start Failed! Status: %d\n", status);
         return status;
     }
-
+    I2C_ResetBus(I2C1_BASE);
     status = I2C_MasterWriteBlocking(I2C1_BASE, data, sizeof(data), kI2C_TransferDefaultFlag);
     if (status != kStatus_Success) {
         printf("I2C Write Failed! Status: %d\n", status);
         return status;
     }
+
 
     status = I2C_MasterStop(I2C1_BASE);
     if (status != kStatus_Success) {
