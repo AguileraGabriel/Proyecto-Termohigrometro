@@ -71,6 +71,24 @@ void InitADC(uint32_t channelMask) {
     ADC_EnableConvSeqA(ADC0, true); // Habilita la secuencia A
 }
 
+// Convierte el valor del ADC a temperatura en Celsius
+float ConvertADCToTemperature(uint32_t adcValue) {
+    float voltage = (float)adcValue * V_REF / 4095.0; // Conversión ADC a voltaje (12 bits)
+    float rThermistor = R_REF * voltage / (V_REF - voltage); // Resistencia del termistor
+
+    // Evitar divisiones por cero o valores inválidos
+    if (rThermistor <= 0) {
+        return -273.15; // Error: temperatura imposible (por debajo del cero absoluto)
+    }
+
+    // Ecuación de Steinhart-Hart
+    float logR = log(rThermistor); // ln(R)
+    float tempKelvin = 1.0 / (A + B * logR + C * logR * logR * logR); // Kelvin
+    float tempCelsius = tempKelvin - 273.15; // Convertir a Celsius
+
+    return tempCelsius;
+}
+
 
 /*
 void InitADC(uint32_t adcChannel, uint32_t pin)

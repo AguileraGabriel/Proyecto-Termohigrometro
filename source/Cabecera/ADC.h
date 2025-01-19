@@ -13,6 +13,15 @@
 #include "fsl_iocon.h"
 #include "fsl_power.h"
 #include "fsl_swm_connections.h"
+#include <math.h> // Para funciones log y pow
+
+
+// Constantes para el termistor (ajusta según tu hoja de datos)
+#define A 0.001129148 // Constante A de Steinhart-Hart
+#define B 0.000234125 // Constante B de Steinhart-Hart
+#define C 0.0000000876741 // Constante C de Steinhart-Hart
+#define R_REF 5000.0      // Resistencia de referencia (5kΩ)
+#define V_REF 3.3         // Voltaje de referencia del divisor (3.3V)
 
 // Estructura para la configuración del ADC
 typedef struct {
@@ -30,6 +39,8 @@ void ADC_StartConversion(ADC_Type *base);
 // Obtiene el resultado de un canal específico (no bloqueante)
 bool ADC_GetChannelResult(ADC_Type *base, uint32_t channel, uint32_t *result);
 
+//Convierto el valor del ADC en temperatura
+float ConvertADCToTemperature(uint32_t adcValue);
 
 //void InitADC_MultiChannel(uint32_t channelMask);
 
