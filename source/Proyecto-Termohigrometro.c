@@ -48,6 +48,7 @@ int main(void){
 	BOARD_InitDebugConsole();
 
 	I2C_Init();
+	//setCurrentTime();
 
 
 	//setCurrentTime();
@@ -65,8 +66,8 @@ int main(void){
 
 	//Variables requeridas
 	sht30_data_t data;
-	//uint8_t hours, minutes, seconds;
-	//uint8_t day, month, year;
+	uint8_t hours, minutes, seconds;
+	uint8_t day, month, year;
 
 	uint32_t adcResult0 = 0, adcResult1 = 0;
 	float inyeccion = 0, retorno = 0, saltoTermico = 0;
@@ -93,65 +94,25 @@ int main(void){
 			data.dewpoint = SHT30_CalculateDewPoint(data.temperature, data.humidity);
 		}
 
-		// Enviar datos por UART
-		SendDataUART(inyeccion, retorno, saltoTermico, data);
+
+
+		// Enviar datos por UART en formato JSON
+		SendDataUART_JSON(inyeccion, retorno, saltoTermico, data);
+
 
 		// Actualizar la pantalla OLED con los datos obtenidos
 		UpdateOLED(inyeccion, retorno, saltoTermico, data);
 
+		// Leer hora y fecha del RTC
+		if (DS1307_GetTime(&hours, &minutes, &seconds) == kStatus_Success &&
+				DS1307_GetDate(&day, &month, &year) == kStatus_Success) {
+			sprintf(buffer3, "Date: %02d/%02d/%02d Time: %02d:%02d:%02d\r\n",
+					day, month, year, hours, minutes, seconds);
+			UART_WriteString(USART1, buffer3);
+		}
+
 		// Pausa de 500 ms para dar sensación de tiempo real
-		SDK_DelayAtLeastUs(500000, SystemCoreClock); // 500 ms
+		SDK_DelayAtLeastUs(250000, SystemCoreClock); // 500 ms
 	}
-		/*
-		// Disparar la conversión del ADC
-		ADC_StartConversion(ADC0);
-
-
-		// Leer el resultado de la conversión
-		if (ADC_GetChannelResult(ADC0, 0, &adcResult0)) { // Canal 0
-			sprintf(LecturaADC,"Resultado del ADC0: %lu\r\n", adcResult0);
-		} else {
-			sprintf(LecturaADC,"Esperando resultado del ADC0...\r\n");
-		}
-		UART_WriteString(USART1, LecturaADC);
-		temperatura = ConvertADCToTemperatureBeta(adcResult0);
-		sprintf(mensaje,"Temperatura en el ADC0: %lu\r\n", (int)temperatura);
-		UART_WriteString(USART1, mensaje);
-
-		// Leo el otro ADC
-
-		// Leer el resultado de la conversión
-		if (ADC_GetChannelResult(ADC0, 1, &adcResult1)) { // Canal 1
-			sprintf(LecturaADC,"Resultado del ADC1: %lu\r\n", adcResult1);
-		} else {
-			sprintf(LecturaADC,"Esperando resultado del ADC1...\r\n");
-		}
-		UART_WriteString(USART1, LecturaADC);
-		temperatura = ConvertADCToTemperatureBeta(adcResult1);
-		sprintf(mensaje,"Temperatura en el ADC1: %lu\r\n", (int)temperatura);
-		UART_WriteString(USART1, mensaje);
-
-
-	    // Leer datos del SHT30
-		if (SHT30_ReadData(I2C1_BASE, &data) == kStatus_Success) {
-			data.dewpoint = SHT30_CalculateDewPoint(data.temperature, data.humidity);
-			sprintf(buffer2, "Temp: %d C Hum: %d%% DewPt: %d C\r\n",
-					(int)data.temperature, (int)data.humidity, (int)data.dewpoint);
-			UART_WriteString(USART1, buffer2);
-		}
-		*/
-	    /*
-	    // Leer hora y fecha del RTC
-	    if (DS1307_GetTime(&hours, &minutes, &seconds) == kStatus_Success &&
-	        DS1307_GetDate(&day, &month, &year) == kStatus_Success) {
-	        sprintf(buffer3, "Date: %02d/%02d/%02d Time: %02d:%02d:%02d\r\n",
-	                day, month, year, hours, minutes, seconds);
-	        UART_WriteString(USART1, buffer3);
-	    }
-		*/
-
-	    // Pausa de 1 segundo
-	    //SDK_DelayAtLeastUs(1000000, SystemCoreClock);
-
 }
 
