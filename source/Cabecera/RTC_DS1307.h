@@ -9,7 +9,7 @@
 #define CABECERA_RTC_DS1307_H_
 
 
-#define DS1307_I2C_ADDRESS		0X63
+#define DS1307_I2C_ADDRESS		0X68
 /*--------------------------------------
  * Conversion Functions
  *--------------------------------------*/
