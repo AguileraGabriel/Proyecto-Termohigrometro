@@ -101,7 +101,6 @@ int main(void){
 
 		// Pausa de 500 ms para dar sensación de tiempo real
 		SDK_DelayAtLeastUs(500000, SystemCoreClock); // 500 ms
-
 	}
 		/*
 		// Disparar la conversión del ADC
