@@ -43,6 +43,7 @@
 
 #include "fsl_common.h"
 #include "Font5x7.h"
+#include "SHT30.h"
 
 /*******************************************************************************
  * Definitions
@@ -230,6 +231,11 @@ void OLED_Copy_Image(const uint8_t *Img, uint16_t size);
 
 void OLED_Draw_Logo(const uint8_t *bitmap, uint8_t width, uint8_t height, uint8_t x, uint8_t y);
 
+/*************************
+ * Para uso de este proyecto
+ *************************/
+
+void UpdateOLED(float inyeccion, float retorno, float saltoTermico, sht30_data_t data);
 
 
 

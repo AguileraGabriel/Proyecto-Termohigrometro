@@ -45,6 +45,7 @@
  ******************************************************************************/
 /*! @brief OLED buffer */
 static uint8_t OLED_Buffer[(OLED_WIDTH * OLED_HEIGHT) / 8];
+char bufferOLED[64]; // Buffer para texto en la pantalla OLED
 
 /*******************************************************************************
  * Code
@@ -365,3 +366,45 @@ void OLED_Fill_Rect(uint8_t X_axis, uint8_t Y_axis, uint8_t Width, uint8_t Heigh
         }
     }
 }
+
+
+/************************************
+ * Uso especifico para este proyecto
+ * **********************************/
+
+void UpdateOLED(float inyeccion, float retorno, float saltoTermico, sht30_data_t data) {
+    OLED_Clear(); // Limpia el buffer del OLED para preparar la nueva información
+
+    // Línea 1: Título
+    OLED_Set_Text(0, 0, kOLED_Pixel_Set, "Mediciones en Tiempo Real", 1);
+
+    // Línea 2: Datos de Inyección
+    sprintf(bufferOLED, "Inyeccion: %.2f C", inyeccion);
+    OLED_Set_Text(0, 8, kOLED_Pixel_Set, bufferOLED, 1); // Línea en Y = 8
+
+    // Línea 3: Datos de Retorno
+    sprintf(bufferOLED, "Retorno: %.2f C", retorno);
+    OLED_Set_Text(0, 16, kOLED_Pixel_Set, bufferOLED, 1); // Línea en Y = 16
+
+    // Línea 4: Salto Térmico
+    sprintf(bufferOLED, "Salto Termico: %.2f C", saltoTermico);
+    OLED_Set_Text(0, 24, kOLED_Pixel_Set, bufferOLED, 1); // Línea en Y = 24
+
+    // Línea 5: Datos del SHT30 - Temp Ref
+    sprintf(bufferOLED, "Temp Ref: %0.2f C", data.temperature);
+    OLED_Set_Text(0, 32, kOLED_Pixel_Set, bufferOLED, 1); // Línea en Y = 32
+
+    // Línea 6: Datos del SHT30 - Hum Ref
+    sprintf(bufferOLED, "Hum Ref: %d%%", (int)data.humidity);
+    OLED_Set_Text(0, 40, kOLED_Pixel_Set, bufferOLED, 1); // Línea en Y = 40
+
+    // Línea 7: Datos del SHT30 - DewPoint
+    sprintf(bufferOLED, "Dew Point: %0.2f C", data.dewpoint);
+    OLED_Set_Text(0, 48, kOLED_Pixel_Set, bufferOLED, 1); // Línea en Y = 48
+
+    OLED_Refresh(); // Refresca el OLED para mostrar los nuevos datos
+}
+
+
+
+
