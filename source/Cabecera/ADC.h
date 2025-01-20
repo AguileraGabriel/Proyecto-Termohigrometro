@@ -51,6 +51,8 @@ float ConvertADCToTemperature(uint32_t adcValue);
 float ConvertADCToTemperatureBeta(uint32_t adcValue);
 
 
+
+
 //void InitADC_MultiChannel(uint32_t channelMask);
 
 
