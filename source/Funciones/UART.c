@@ -14,6 +14,7 @@ uint8_t flagReceived = 0, dataUsart;
 
 char buffer[64]; //Buffer donde cargo la informacion a enviar por USART.
 char newline []="\r\n"; //Buffer para realizar un salto de linea.
+char bufferUART[128];
 
 
 /*
@@ -90,6 +91,40 @@ void UART_WriteString(USART_Type *base, const char *data) {
         USART_WriteByte(base, *data++);
     }
 }
+
+/***************************
+ * Propias del Proyecto
+ * *************************/
+void SendDataUART(float inyeccion, float retorno, float saltoTermico, sht30_data_t data) {
+    // Enviar temperatura de Inyección (Termistor 1)
+    sprintf(bufferUART, "Inyeccion: %d C\r\n", (int)inyeccion);
+    UART_WriteString(USART1, bufferUART);
+
+    // Enviar temperatura de Retorno (Termistor 2)
+    sprintf(bufferUART, "Retorno: %d C\r\n", (int)retorno);
+    UART_WriteString(USART1, bufferUART);
+
+    // Enviar Salto Térmico
+    sprintf(bufferUART, "Salto Termico: %d C\r\n", (int)saltoTermico);
+    UART_WriteString(USART1, bufferUART);
+
+    // Enviar datos del SHT30 - Temp Ref
+    sprintf(bufferUART, "Temp Ref: %d C\r\n", (int)data.temperature);
+    UART_WriteString(USART1, bufferUART);
+
+    // Enviar datos del SHT30 - Hum Ref
+    sprintf(bufferUART, "Hum Ref: %d%%\r\n", (int)data.humidity);
+    UART_WriteString(USART1, bufferUART);
+
+    // Enviar datos del SHT30 - Dew Point
+    sprintf(bufferUART, "Dew Point: %d C\r\n", (int)data.dewpoint);
+    UART_WriteString(USART1, bufferUART);
+
+    // Línea en blanco para separar mediciones
+    UART_WriteString(USART1, "\r\n");
+}
+
+
 
 
 //---------------------------------------------------------------//

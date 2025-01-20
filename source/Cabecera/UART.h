@@ -15,6 +15,7 @@
 #include "pin_mux.h"
 #include <stdbool.h>
 #include <stdio.h>
+#include "SHT30.h"
 
 //---------------------------------------------------------------//
 
@@ -48,6 +49,11 @@ void Send_USART(USART_Type *base, uint8_t data, char texto);
 
 void UART_WriteString(USART_Type *base, const char *data);
 
+/***************************
+ * Propias del Proyecto
+ * *************************/
+
+void SendDataUART(float inyeccion, float retorno, float saltoTermico, sht30_data_t data);
 
 /*
  * Si recibo informacion por USART desde la computadora, la leo y
