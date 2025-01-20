@@ -23,6 +23,12 @@
 #define R_REF 5000.0      // Resistencia de referencia (5kΩ)
 #define V_REF 3.3         // Voltaje de referencia del divisor (3.3V)
 
+// Constantes del termistor
+//#define BETA 3950.0      // Valor típico del coeficiente beta (ajusta según el termistor)
+#define BETA 15000.0      // Valor típico del coeficiente beta (ajusta según el termistor)
+#define R_25 5000.0      // Resistencia del termistor a 25°C (5kΩ)
+#define T_25 298.15      // Temperatura en Kelvin a 25°C
+
 // Estructura para la configuración del ADC
 typedef struct {
     ADC_Type *base;             // Base del periférico ADC
@@ -41,6 +47,9 @@ bool ADC_GetChannelResult(ADC_Type *base, uint32_t channel, uint32_t *result);
 
 //Convierto el valor del ADC en temperatura
 float ConvertADCToTemperature(uint32_t adcValue);
+
+float ConvertADCToTemperatureBeta(uint32_t adcValue);
+
 
 //void InitADC_MultiChannel(uint32_t channelMask);
 
