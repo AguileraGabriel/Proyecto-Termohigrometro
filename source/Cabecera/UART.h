@@ -55,6 +55,10 @@ void UART_WriteString(USART_Type *base, const char *data);
 
 void SendDataUART(float inyeccion, float retorno, float saltoTermico, sht30_data_t data);
 
+void SendDataUART_JSON(float inyeccion, float retorno, float saltoTermico, sht30_data_t data);
+
+
+
 /*
  * Si recibo informacion por USART desde la computadora, la leo y
  * almaceno en dataUsart.
