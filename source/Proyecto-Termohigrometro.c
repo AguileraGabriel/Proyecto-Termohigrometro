@@ -67,15 +67,42 @@ int main(void){
 	sht30_data_t data;
 	//uint8_t hours, minutes, seconds;
 	//uint8_t day, month, year;
-	uint32_t adcResult0 = 0;
-	uint32_t adcResult1 = 0;
-	float temperatura = 0;
 
+	uint32_t adcResult0 = 0, adcResult1 = 0;
+	float inyeccion = 0, retorno = 0, saltoTermico = 0;
 
 	while (1) {
+		// Disparar la conversión del ADC
+		ADC_StartConversion(ADC0);
 
+		// Leer el resultado del canal 0 (Inyección)
+		if (ADC_GetChannelResult(ADC0, 0, &adcResult0)) {
+			inyeccion = ConvertADCToTemperatureBeta(adcResult0); // Convierte a temperatura
+		}
 
+		// Leer el resultado del canal 1 (Retorno)
+		if (ADC_GetChannelResult(ADC0, 1, &adcResult1)) {
+			retorno = ConvertADCToTemperatureBeta(adcResult1); // Convierte a temperatura
+		}
 
+		// Calcular el salto térmico
+		saltoTermico = retorno - inyeccion;
+
+		// Leer datos del SHT30
+		if (SHT30_ReadData(I2C1_BASE, &data) == kStatus_Success) {
+			data.dewpoint = SHT30_CalculateDewPoint(data.temperature, data.humidity);
+		}
+
+		// Enviar datos por UART
+		SendDataUART(inyeccion, retorno, saltoTermico, data);
+
+		// Actualizar la pantalla OLED con los datos obtenidos
+		UpdateOLED(inyeccion, retorno, saltoTermico, data);
+
+		// Pausa de 500 ms para dar sensación de tiempo real
+		SDK_DelayAtLeastUs(500000, SystemCoreClock); // 500 ms
+	}
+		/*
 		// Disparar la conversión del ADC
 		ADC_StartConversion(ADC0);
 
@@ -87,7 +114,7 @@ int main(void){
 			sprintf(LecturaADC,"Esperando resultado del ADC0...\r\n");
 		}
 		UART_WriteString(USART1, LecturaADC);
-		temperatura = ConvertADCToTemperature(adcResult0);
+		temperatura = ConvertADCToTemperatureBeta(adcResult0);
 		sprintf(mensaje,"Temperatura en el ADC0: %lu\r\n", (int)temperatura);
 		UART_WriteString(USART1, mensaje);
 
@@ -100,7 +127,7 @@ int main(void){
 			sprintf(LecturaADC,"Esperando resultado del ADC1...\r\n");
 		}
 		UART_WriteString(USART1, LecturaADC);
-		temperatura = ConvertADCToTemperature(adcResult1);
+		temperatura = ConvertADCToTemperatureBeta(adcResult1);
 		sprintf(mensaje,"Temperatura en el ADC1: %lu\r\n", (int)temperatura);
 		UART_WriteString(USART1, mensaje);
 
@@ -112,7 +139,7 @@ int main(void){
 					(int)data.temperature, (int)data.humidity, (int)data.dewpoint);
 			UART_WriteString(USART1, buffer2);
 		}
-
+		*/
 	    /*
 	    // Leer hora y fecha del RTC
 	    if (DS1307_GetTime(&hours, &minutes, &seconds) == kStatus_Success &&
@@ -124,7 +151,7 @@ int main(void){
 		*/
 
 	    // Pausa de 1 segundo
-	    SDK_DelayAtLeastUs(1000000, SystemCoreClock);
-	}
+	    //SDK_DelayAtLeastUs(1000000, SystemCoreClock);
+
 }
 
