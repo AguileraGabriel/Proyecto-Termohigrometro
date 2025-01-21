@@ -199,3 +199,19 @@ status_t DS1307_GetDate(uint8_t *day, uint8_t *month, uint8_t *year) {
     return kStatus_Success;
 }
 
+/*--------------------------------------
+ * Get RTC Date and Time Function
+ *--------------------------------------*/
+rtc_datetime_t GetRTCDateTime(void) {
+    rtc_datetime_t datetime = {0};
+
+    if (DS1307_GetTime(&datetime.hours, &datetime.minutes, &datetime.seconds) == kStatus_Success &&
+        DS1307_GetDate(&datetime.day, &datetime.month, &datetime.year) == kStatus_Success) {
+        return datetime; // Retorna los datos correctamente leídos
+    }
+
+    // Si falla, regresa un valor predeterminado
+    printf("Failed to read RTC date and time.\n");
+    return datetime;
+}
+
