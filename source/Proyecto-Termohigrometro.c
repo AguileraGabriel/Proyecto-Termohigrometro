@@ -16,6 +16,7 @@
  * Defines
  * **************************************/
 
+
 //#define ADC_BASE ADC0
 //#define ADC_PIN_THERMISTOR1 0U // Canal del termistor 1
 
@@ -47,9 +48,6 @@ int main(void){
 	I2C_Init();
 	//setCurrentTime();
 
-
-	//setCurrentTime();
-
 	InitADC((1 << 0) | (1 << 1)); // Habilita los canales 0 y 1
 
 	OLED_Init();
@@ -62,11 +60,26 @@ int main(void){
 
 
 	//Variables requeridas
+	//SHT30
 	sht30_data_t data;
 
-
+	//ADC
 	uint32_t adcResult0 = 0, adcResult1 = 0;
 	float inyeccion = 0, retorno = 0, saltoTermico = 0;
+
+	//OLED
+	const tImage Copodenieve = { image_data_Copodenieve, 24, 24, 8 };
+	const tImage Sol = { image_data_Sol, 24, 24, 8 };
+	const tImage Termometro = { image_data_Termometro, 24, 24, 8 };
+
+
+
+	ShowIconAndText(Copodenieve,"Modo Refrigeracion");
+
+	ShowIconAndText(Sol,"Modo Calefaccion");
+
+	ShowIconAndText(Termometro,"Modo Termohigrometro");
+
 
 	while (1) {
 		// Disparar la conversión del ADC
@@ -104,8 +117,8 @@ int main(void){
 		UpdateOLED(inyeccion, retorno, saltoTermico, data);
 
 
-		// Pausa de 500 ms para dar sensación de tiempo real
-		SDK_DelayAtLeastUs(250000, SystemCoreClock); // 500 ms
+		// Pausa de 250 ms para dar sensación de tiempo real
+		SDK_DelayAtLeastUs(250000, SystemCoreClock); // 250 ms
 	}
 }
 
