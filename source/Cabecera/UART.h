@@ -16,6 +16,8 @@
 #include <stdbool.h>
 #include <stdio.h>
 #include "SHT30.h"
+#include "RTC_DS1307.h"
+
 
 //---------------------------------------------------------------//
 
@@ -55,7 +57,10 @@ void UART_WriteString(USART_Type *base, const char *data);
 
 void SendDataUART(float inyeccion, float retorno, float saltoTermico, sht30_data_t data);
 
-void SendDataUART_JSON(float inyeccion, float retorno, float saltoTermico, sht30_data_t data);
+//void SendDataUART_JSON(float inyeccion, float retorno, float saltoTermico, sht30_data_t data);
+
+
+void SendDataUART_JSON(float inyeccion, float retorno, float saltoTermico, sht30_data_t data, rtc_datetime_t datetime);
 
 
 

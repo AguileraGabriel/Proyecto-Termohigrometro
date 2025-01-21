@@ -126,7 +126,7 @@ void SendDataUART(float inyeccion, float retorno, float saltoTermico, sht30_data
     UART_WriteString(USART1, "\r\n");
 }
 
-
+/*
 //Envio mis datos en formato JSON
 void SendDataUART_JSON(float inyeccion, float retorno, float saltoTermico, sht30_data_t data) {
     // Generar mensaje JSON directamente con los valores flotantes
@@ -137,9 +137,20 @@ void SendDataUART_JSON(float inyeccion, float retorno, float saltoTermico, sht30
     // Enviar el mensaje por UART
     UART_WriteString(USART1, bufferUART);
 }
+*/
 
 
+void SendDataUART_JSON(float inyeccion, float retorno, float saltoTermico, sht30_data_t data, rtc_datetime_t datetime) {
+    // Generar mensaje JSON directamente con los valores flotantes y fecha/hora
+    sprintf(bufferUART,
+            "{ \"inyeccion\": %.2f, \"retorno\": %.2f, \"saltoTermico\": %.2f, \"tempRef\": %.2f, \"humRef\": %d, \"dewPoint\": %.2f, "
+            "\"date\": \"%02d/%02d/%02d\", \"time\": \"%02d:%02d:%02d\" }\r\n",
+            inyeccion, retorno, saltoTermico, data.temperature, (int)data.humidity, data.dewpoint,
+            datetime.day, datetime.month, datetime.year, datetime.hours, datetime.minutes, datetime.seconds);
 
+    // Enviar el mensaje por UART
+    UART_WriteString(USART1, bufferUART);
+}
 
 
 
