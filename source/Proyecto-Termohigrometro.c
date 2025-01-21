@@ -25,10 +25,7 @@
  * **************************************/
 
 
-char buffer2 [64];
 char buffer3 [64];
-char LecturaADC [64];
-char mensaje [64];
 
 
 
@@ -66,8 +63,7 @@ int main(void){
 
 	//Variables requeridas
 	sht30_data_t data;
-	uint8_t hours, minutes, seconds;
-	uint8_t day, month, year;
+
 
 	uint32_t adcResult0 = 0, adcResult1 = 0;
 	float inyeccion = 0, retorno = 0, saltoTermico = 0;
@@ -94,22 +90,19 @@ int main(void){
 			data.dewpoint = SHT30_CalculateDewPoint(data.temperature, data.humidity);
 		}
 
-
+		// Obtener fecha y hora del RTC
+		rtc_datetime_t datetime = GetRTCDateTime();
 
 		// Enviar datos por UART en formato JSON
-		SendDataUART_JSON(inyeccion, retorno, saltoTermico, data);
+		SendDataUART_JSON(inyeccion, retorno, saltoTermico, data, datetime);
+
+		// Enviar datos por UART en formato JSON
+		//SendDataUART_JSON(inyeccion, retorno, saltoTermico, data);
 
 
 		// Actualizar la pantalla OLED con los datos obtenidos
 		UpdateOLED(inyeccion, retorno, saltoTermico, data);
 
-		// Leer hora y fecha del RTC
-		if (DS1307_GetTime(&hours, &minutes, &seconds) == kStatus_Success &&
-				DS1307_GetDate(&day, &month, &year) == kStatus_Success) {
-			sprintf(buffer3, "Date: %02d/%02d/%02d Time: %02d:%02d:%02d\r\n",
-					day, month, year, hours, minutes, seconds);
-			UART_WriteString(USART1, buffer3);
-		}
 
 		// Pausa de 500 ms para dar sensación de tiempo real
 		SDK_DelayAtLeastUs(250000, SystemCoreClock); // 500 ms
