@@ -47,6 +47,7 @@
 static uint8_t OLED_Buffer[(OLED_WIDTH * OLED_HEIGHT) / 8];
 char bufferOLED[64]; // Buffer para texto en la pantalla OLED
 
+
 /*******************************************************************************
  * Code
  ******************************************************************************/
@@ -334,7 +335,7 @@ void OLED_Draw_Logo(const uint8_t *bitmap, uint8_t width, uint8_t height, uint8_
     }
 
     // Refresca el display para aplicar los cambios
-    OLED_Refresh();
+    //OLED_Refresh();
 }
 
 void OLED_Fill_Rect(uint8_t X_axis, uint8_t Y_axis, uint8_t Width, uint8_t Height, uint8_t SC)
@@ -405,6 +406,51 @@ void UpdateOLED(float inyeccion, float retorno, float saltoTermico, sht30_data_t
     OLED_Refresh(); // Refresca el OLED para mostrar los nuevos datos
 }
 
+/*Paso el texto en formato "Texto a mostrar" y va a apatecer centrado
+ *en la pantalla
+ */
+void ShowText(const char *text) {
+    uint8_t textLength = strlen(text);                         // Longitud del texto
+    uint8_t textWidth = textLength * 5;                        // Ancho del texto sin escala (cada carácter = 5 px)
+    uint8_t scale = 1;                                         // Escala del texto (puedes cambiarla entre 1, 2 o 3)
+    uint8_t x = (OLED_WIDTH - (textWidth * scale)) / 2;        // Centrado horizontal
+    uint8_t y = (OLED_HEIGHT - (8 * scale)) / 1.4;               // Centrado vertical (altura del texto = 8 px)
+
+    //OLED_Clear();                                              // Limpiar la pantalla
+    OLED_Set_Text(x, y, 1, (char *)text, scale);               // Dibujar el texto centrado
+    //OLED_Refresh();                                            // Actualizar la pantalla
+
+    // Pausa para mostrar el mensaje (opcional)
+    //SDK_DelayAtLeastUs(3000000, SystemCoreClock);              // 3 segundos
+}
+
+
+
+
+void ShowIcon(tImage logo) {
+    // Dibuja el ícono en el centro de la pantalla OLED
+    uint8_t x = (OLED_WIDTH - logo.width) / 2;
+    uint8_t y = (OLED_HEIGHT - logo.height) / 4;
+
+    OLED_Clear(); // Limpiar la pantalla
+    OLED_Draw_Logo(logo.data, logo.width, logo.height, x, y);
+    //OLED_Refresh(); // Actualizar la pantalla
+
+    // Esperar 3 segundos mostrando el ícono
+    //SDK_DelayAtLeastUs(3000000, SystemCoreClock);
+}
+
+
+void ShowIconAndText(tImage logo, const char *text){
+	OLED_Clear();
+
+	ShowIcon(logo);
+	ShowText(text);
+
+	OLED_Refresh();
+
+	SDK_DelayAtLeastUs(1000000, SystemCoreClock);
+}
 
 
 
