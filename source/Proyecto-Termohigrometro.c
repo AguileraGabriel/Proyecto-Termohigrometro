@@ -11,22 +11,24 @@
 #include "board.h"
 #include "pin_mux.h"
 #include "clock_config.h"
+#include "stdbool.h"
 
 /*****************************************
  * Defines
  * **************************************/
 
 
-//#define ADC_BASE ADC0
-//#define ADC_PIN_THERMISTOR1 0U // Canal del termistor 1
-
-
 /*****************************************
  * Variables
  * **************************************/
 
+//char buffer3 [64];
 
-char buffer3 [64];
+bool menuPrincipalActivo;
+
+Modo modo;
+
+uint8_t ultimoTiempo = 255;
 
 
 
@@ -35,6 +37,8 @@ char buffer3 [64];
  * **************************************/
 
 int main(void){
+	menuPrincipalActivo = true;
+	modo = REFRIGERACION;
 
 	NVIC_SetPriority(USART1_IRQn, 1);		// Alta prioridad para UART
 	NVIC_SetPriority(I2C1_IRQn, 3);   		// Baja prioridad para I2C
@@ -44,18 +48,20 @@ int main(void){
 	//Inicializaciones
 
 	BOARD_InitDebugConsole();
-
+	//Inicializo I2C
 	I2C_Init();
-	//setCurrentTime();
-
+	//Iniciacializo ADC
 	InitADC((1 << 0) | (1 << 1)); // Habilita los canales 0 y 1
-
+	//Inicializo OLED
 	OLED_Init();
 	OLED_Clear();
 	OLED_Refresh();
-
+	//Inicializo UART
 	Init_UART();
-
+	//Inicializo pulsadores y LED
+	Init_PinIn();
+	Init_PinOut();
+	//Reinicio SHT30 para garantizar funcionamiento del modulo
 	SHT30_SoftReset(I2C1_BASE);
 
 
@@ -71,32 +77,78 @@ int main(void){
 	const tImage Copodenieve = { image_data_Copodenieve, 24, 24, 8 };
 	const tImage Sol = { image_data_Sol, 24, 24, 8 };
 	const tImage Termometro = { image_data_Termometro, 24, 24, 8 };
+	//const tImage UTN = { image_data_UTN, 100, 50, 8 };
+
+
+	//const tImage Cuadrado = { image_data_Cuadrado, 24, 24, 8 };
 
 
 
-	ShowIconAndText(Copodenieve,"Modo Refrigeracion");
 
-	ShowIconAndText(Sol,"Modo Calefaccion");
 
-	ShowIconAndText(Termometro,"Modo Termohigrometro");
+	//startTime =
 
+
+
+	ShowIconAndTextWithDelay(Copodenieve,"Seleccione Modo", 2500000);//con delay
+	ShowIconAndText(Copodenieve,"Modo Refrigeracion");//sin delay
 
 	while (1) {
-		// Disparar la conversión del ADC
-		ADC_StartConversion(ADC0);
 
-		// Leer el resultado del canal 0 (Inyección)
-		if (ADC_GetChannelResult(ADC0, 0, &adcResult0)) {
-			inyeccion = ConvertADCToTemperatureBeta(adcResult0); // Convierte a temperatura
+		bool botonCambioActivo = leerApretarBotonCambio();
+		if(botonCambioActivo){ //solo entro aca si toco el boton de cambio
+			menuPrincipalActivo = true;
+			modo = ((modo + 1) %3);
+			//pasar el switch a una funcion que reciba modo
+			//imprimirModo(modo)
+			switch(modo){
+				case REFRIGERACION:
+					ShowIconAndText(Copodenieve,"Modo Refrigeracion");
+					break;
+				case CALEFACCION:
+					ShowIconAndText(Sol,"Modo Calefaccion");
+					break;
+				case TERMOHIGROMETRO:
+					ShowIconAndText(Termometro,"Modo Termohigrometro");
+					break;
+				default:
+					ShowIconAndText(Copodenieve,"Modo Refrigeracion");
+			}
 		}
 
-		// Leer el resultado del canal 1 (Retorno)
-		if (ADC_GetChannelResult(ADC0, 1, &adcResult1)) {
-			retorno = ConvertADCToTemperatureBeta(adcResult1); // Convierte a temperatura
+		bool botonAceptacionActivo = leerApretarBotonAceptacion();
+		if (botonAceptacionActivo){
+			menuPrincipalActivo = false;
+		}
+		if(menuPrincipalActivo){
+			continue;
 		}
 
-		// Calcular el salto térmico
-		saltoTermico = retorno - inyeccion;
+		if(modo == REFRIGERACION || modo == CALEFACCION){
+			// Disparar la conversión del ADC
+			ADC_StartConversion(ADC0);
+
+			// Leer el resultado del canal 0 (Inyección)
+			if (ADC_GetChannelResult(ADC0, 0, &adcResult0)) {
+				inyeccion = ConvertADCToTemperatureBeta(adcResult0); // Convierte a temperatura
+			}
+
+			// Leer el resultado del canal 1 (Retorno)
+			if (ADC_GetChannelResult(ADC0, 1, &adcResult1)) {
+				retorno = ConvertADCToTemperatureBeta(adcResult1); // Convierte a temperatura
+			}
+
+			// Calcular el salto térmico
+			saltoTermico = retorno - inyeccion;
+
+			if (modo == REFRIGERACION){
+				prendeLEDRef(saltoTermico);
+			}
+			else{ //modo == CALEFACCION
+
+				prendeLEDCal(saltoTermico);
+			}
+		}
 
 		// Leer datos del SHT30
 		if (SHT30_ReadData(I2C1_BASE, &data) == kStatus_Success) {
@@ -105,20 +157,28 @@ int main(void){
 
 		// Obtener fecha y hora del RTC
 		rtc_datetime_t datetime = GetRTCDateTime();
+		//guardo el currentTime
+		//calculo el elapsedTime = currentTime - startTime
+		//if (elapsedtime %1000)
+
 
 		// Enviar datos por UART en formato JSON
-		SendDataUART_JSON(inyeccion, retorno, saltoTermico, data, datetime);
+		if(ultimoTiempo != datetime.seconds){
+			UpdateOLED(modo, inyeccion, retorno, saltoTermico, data); // AGREGAR PRIMER PARAMETRO DE MODO
+			SendDataUART_JSON(modo, inyeccion, retorno, saltoTermico, data, datetime);// AGREGAR PRIMER PARAMETRO DE MODO		}
+			ultimoTiempo = datetime.seconds;
+		}
 
 		// Enviar datos por UART en formato JSON
 		//SendDataUART_JSON(inyeccion, retorno, saltoTermico, data);
 
 
 		// Actualizar la pantalla OLED con los datos obtenidos
-		UpdateOLED(inyeccion, retorno, saltoTermico, data);
+		//UpdateOLED(modo, inyeccion, retorno, saltoTermico, data); // AGREGAR PRIMER PARAMETRO DE MODO
 
 
 		// Pausa de 250 ms para dar sensación de tiempo real
-		SDK_DelayAtLeastUs(250000, SystemCoreClock); // 250 ms
+		//SDK_DelayAtLeastUs(250000, SystemCoreClock); // 250 ms
 	}
 }
 
