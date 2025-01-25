@@ -15,9 +15,10 @@
 #include "clock_config.h"
 #include "LPC845.h"
 #include "fsl_debug_console.h"
+#include "stdbool.h"
 
-#define Switch_1 28 //Pulsador en PIN 14
-#define Switch_2 29 //Pulsador en PIN 15
+#define Switch_1 10 //Pulsador en PIN 23
+#define Switch_2 11 //Pulsador en PIN 22
 #define Switch_3 30 //Pulsador en PIN 16
 
 
@@ -27,6 +28,20 @@
 
 #define LED_ON 0
 #define LED_OFF 1
+
+#define DEBOUNCE_DELAY_US 50000 // 50 ms (ajustable según las características del botón)
+
+void Init_PinIn(void);
+
+void Init_PinOut(void);
+
+
+void prendeLEDRef(float saltoTermico);
+void prendeLEDCal(float saltoTermico);
+
+bool leerApretarBotonAceptacion(void);
+bool leerApretarBotonCambio(void);
+
 
 
 
