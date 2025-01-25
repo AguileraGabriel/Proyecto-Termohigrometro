@@ -236,7 +236,7 @@ void OLED_Draw_Logo(const uint8_t *bitmap, uint8_t width, uint8_t height, uint8_
  * Para uso de este proyecto
  *************************/
 
-void UpdateOLED(float inyeccion, float retorno, float saltoTermico, sht30_data_t data);
+void UpdateOLED(Modo modo, float inyeccion, float retorno, float saltoTermico, sht30_data_t data);
 
 
 void ShowText(const char *text);
@@ -245,6 +245,9 @@ void ShowText(const char *text);
 void ShowIcon(tImage logo);
 
 void ShowIconAndText(tImage logo, const char *text);
+
+void ShowIconAndTextWithDelay(tImage logo, const char *text, uint32_t delay);
+
 
 
 
