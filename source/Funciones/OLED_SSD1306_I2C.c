@@ -32,6 +32,7 @@
 /*---- BASADO EN fsl_SSD1306.h para SPI de NXP ------*/
 
 #include "../Cabecera/OLED_SSD1306_I2C.h"
+#include "../Cabecera/Iconos.h"
 #include "fsl_gpio.h"
 #include "fsl_i2c.h"
 //#include "fsl_Systick_Delay.h"
@@ -318,13 +319,16 @@ void OLED_Copy_Image(const uint8_t *Img, uint16_t size){
 
 void OLED_Draw_Logo(const uint8_t *bitmap, uint8_t width, uint8_t height, uint8_t x, uint8_t y)
 {
-    for (uint8_t i = 0; i < height; i++)
+    // Calcula los bytes por fila (ancho en píxeles dividido por 8, redondeado hacia arriba)
+    uint8_t bytes_per_row = (width + 7) / 8;
+
+    for (uint8_t i = 0; i < height; i++) // Filas
     {
-        for (uint8_t j = 0; j < width; j++)
+        for (uint8_t j = 0; j < width; j++) // Columnas
         {
-            // Calcula el bit actual
-            uint8_t byte_index = (i * (width / 8)) + (j / 8);
-            uint8_t bit_index = j % 8;
+            // Calcula el índice del byte en el array del bitmap
+            uint8_t byte_index = (i * bytes_per_row) + (j / 8);
+            uint8_t bit_index = 7 - (j % 8); // Orden de los bits: MSB a LSB
 
             // Determina si el píxel está encendido
             uint8_t pixel = (bitmap[byte_index] >> bit_index) & 0x01;
@@ -334,9 +338,10 @@ void OLED_Draw_Logo(const uint8_t *bitmap, uint8_t width, uint8_t height, uint8_
         }
     }
 
-    // Refresca el display para aplicar los cambios
-    //OLED_Refresh();
+    // Refresca el display para aplicar los cambios (opcional)
+    // OLED_Refresh();
 }
+
 
 void OLED_Fill_Rect(uint8_t X_axis, uint8_t Y_axis, uint8_t Width, uint8_t Height, uint8_t SC)
 {
@@ -373,35 +378,83 @@ void OLED_Fill_Rect(uint8_t X_axis, uint8_t Y_axis, uint8_t Width, uint8_t Heigh
  * Uso especifico para este proyecto
  * **********************************/
 
-void UpdateOLED(float inyeccion, float retorno, float saltoTermico, sht30_data_t data) {
+void UpdateOLED(Modo modo,float inyeccion, float retorno, float saltoTermico, sht30_data_t data) {
     OLED_Clear(); // Limpia el buffer del OLED para preparar la nueva información
 
-    // Línea 1: Título
-    OLED_Set_Text(0, 0, kOLED_Pixel_Set, "Mediciones en Tiempo Real", 1);
+    if (modo == TERMOHIGROMETRO){
+    	// Línea 1: Título
+    	OLED_Set_Text(0, 0, kOLED_Pixel_Set, "TERMOHIGROMETRO", 1);
 
-    // Línea 2: Datos de Inyección
-    sprintf(bufferOLED, "Inyeccion: %.2f C", inyeccion);
-    OLED_Set_Text(0, 8, kOLED_Pixel_Set, bufferOLED, 1); // Línea en Y = 8
+    	// Línea 2: Datos del SHT30 - Temp Ref
+    	sprintf(bufferOLED, "Temp Ref: %0.2f C", data.temperature);
+    	OLED_Set_Text(0, 20, kOLED_Pixel_Set, bufferOLED, 1); // Línea en Y = 32
 
-    // Línea 3: Datos de Retorno
-    sprintf(bufferOLED, "Retorno: %.2f C", retorno);
-    OLED_Set_Text(0, 16, kOLED_Pixel_Set, bufferOLED, 1); // Línea en Y = 16
+    	// Línea 3: Datos del SHT30 - Hum Ref
+    	sprintf(bufferOLED, "Hum Ref: %d%%", (int)data.humidity);
+    	OLED_Set_Text(0, 28, kOLED_Pixel_Set, bufferOLED, 1); // Línea en Y = 40
 
-    // Línea 4: Salto Térmico
-    sprintf(bufferOLED, "Salto Termico: %.2f C", saltoTermico);
-    OLED_Set_Text(0, 24, kOLED_Pixel_Set, bufferOLED, 1); // Línea en Y = 24
+    	// Línea 4: Datos del SHT30 - DewPoint
+    	sprintf(bufferOLED, "Dew Point: %0.2f C", data.dewpoint);
+    	OLED_Set_Text(0, 36, kOLED_Pixel_Set, bufferOLED, 1); // Línea en Y = 48
 
-    // Línea 5: Datos del SHT30 - Temp Ref
-    sprintf(bufferOLED, "Temp Ref: %0.2f C", data.temperature);
-    OLED_Set_Text(0, 32, kOLED_Pixel_Set, bufferOLED, 1); // Línea en Y = 32
 
-    // Línea 6: Datos del SHT30 - Hum Ref
-    sprintf(bufferOLED, "Hum Ref: %d%%", (int)data.humidity);
-    OLED_Set_Text(0, 40, kOLED_Pixel_Set, bufferOLED, 1); // Línea en Y = 40
+    }else if (modo == REFRIGERACION){
+    	// Línea 1: Título
+    	OLED_Set_Text(0, 0, kOLED_Pixel_Set, "REFRIGERACION", 1);
 
-    // Línea 7: Datos del SHT30 - DewPoint
-    sprintf(bufferOLED, "Dew Point: %0.2f C", data.dewpoint);
-    OLED_Set_Text(0, 48, kOLED_Pixel_Set, bufferOLED, 1); // Línea en Y = 48
+    	// Línea 2: Datos de Inyección
+    	sprintf(bufferOLED, "Inyeccion: %.2f C", inyeccion);
+    	OLED_Set_Text(0, 8, kOLED_Pixel_Set, bufferOLED, 1); // Línea en Y = 8
+
+    	// Línea 3: Datos de Retorno
+    	sprintf(bufferOLED, "Retorno: %.2f C", retorno);
+    	OLED_Set_Text(0, 16, kOLED_Pixel_Set, bufferOLED, 1); // Línea en Y = 16
+
+    	// Línea 4: Salto Térmico
+    	sprintf(bufferOLED, "Salto Termico: %.2f C", saltoTermico);
+    	OLED_Set_Text(0, 24, kOLED_Pixel_Set, bufferOLED, 1); // Línea en Y = 24
+
+    	// Línea 5: Datos del SHT30 - Temp Ref
+    	sprintf(bufferOLED, "Temp Ref: %0.2f C", data.temperature);
+    	OLED_Set_Text(0, 32, kOLED_Pixel_Set, bufferOLED, 1); // Línea en Y = 32
+
+    	// Línea 6: Datos del SHT30 - Hum Ref
+    	sprintf(bufferOLED, "Hum Ref: %d%%", (int)data.humidity);
+    	OLED_Set_Text(0, 40, kOLED_Pixel_Set, bufferOLED, 1); // Línea en Y = 40
+
+    	// Línea 7: Datos del SHT30 - DewPoint
+    	sprintf(bufferOLED, "Dew Point: %0.2f C", data.dewpoint);
+    	OLED_Set_Text(0, 48, kOLED_Pixel_Set, bufferOLED, 1); // Línea en Y = 48
+
+    }else{//CALEFACCION
+    	// Línea 1: Título
+    	OLED_Set_Text(0, 0, kOLED_Pixel_Set, "CALEFACCION", 1);
+
+    	// Línea 2: Datos de Inyección
+    	sprintf(bufferOLED, "Inyeccion: %.2f C", inyeccion);
+    	OLED_Set_Text(0, 8, kOLED_Pixel_Set, bufferOLED, 1); // Línea en Y = 8
+
+    	// Línea 3: Datos de Retorno
+    	sprintf(bufferOLED, "Retorno: %.2f C", retorno);
+    	OLED_Set_Text(0, 16, kOLED_Pixel_Set, bufferOLED, 1); // Línea en Y = 16
+
+    	// Línea 4: Salto Térmico
+    	sprintf(bufferOLED, "Salto Termico: %.2f C", saltoTermico);
+    	OLED_Set_Text(0, 24, kOLED_Pixel_Set, bufferOLED, 1); // Línea en Y = 24
+
+    	// Línea 5: Datos del SHT30 - Temp Ref
+    	sprintf(bufferOLED, "Temp Ref: %0.2f C", data.temperature);
+    	OLED_Set_Text(0, 32, kOLED_Pixel_Set, bufferOLED, 1); // Línea en Y = 32
+
+    	// Línea 6: Datos del SHT30 - Hum Ref
+    	sprintf(bufferOLED, "Hum Ref: %d%%", (int)data.humidity);
+    	OLED_Set_Text(0, 40, kOLED_Pixel_Set, bufferOLED, 1); // Línea en Y = 40
+
+    	// Línea 7: Datos del SHT30 - DewPoint
+    	sprintf(bufferOLED, "Dew Point: %0.2f C", data.dewpoint);
+    	OLED_Set_Text(0, 48, kOLED_Pixel_Set, bufferOLED, 1); // Línea en Y = 48
+
+    }
 
     OLED_Refresh(); // Refresca el OLED para mostrar los nuevos datos
 }
@@ -416,28 +469,23 @@ void ShowText(const char *text) {
     uint8_t x = (OLED_WIDTH - (textWidth * scale)) / 2;        // Centrado horizontal
     uint8_t y = (OLED_HEIGHT - (8 * scale)) / 1.4;               // Centrado vertical (altura del texto = 8 px)
 
-    //OLED_Clear();                                              // Limpiar la pantalla
     OLED_Set_Text(x, y, 1, (char *)text, scale);               // Dibujar el texto centrado
-    //OLED_Refresh();                                            // Actualizar la pantalla
 
-    // Pausa para mostrar el mensaje (opcional)
-    //SDK_DelayAtLeastUs(3000000, SystemCoreClock);              // 3 segundos
+    return;
 }
 
 
 
 
 void ShowIcon(tImage logo) {
-    // Dibuja el ícono en el centro de la pantalla OLED
+    // Dibuja el ícono en la pantalla OLED
     uint8_t x = (OLED_WIDTH - logo.width) / 2;
     uint8_t y = (OLED_HEIGHT - logo.height) / 4;
 
     OLED_Clear(); // Limpiar la pantalla
     OLED_Draw_Logo(logo.data, logo.width, logo.height, x, y);
-    //OLED_Refresh(); // Actualizar la pantalla
 
-    // Esperar 3 segundos mostrando el ícono
-    //SDK_DelayAtLeastUs(3000000, SystemCoreClock);
+    return;
 }
 
 
@@ -449,7 +497,20 @@ void ShowIconAndText(tImage logo, const char *text){
 
 	OLED_Refresh();
 
-	SDK_DelayAtLeastUs(1000000, SystemCoreClock);
+	return;
+}
+
+void ShowIconAndTextWithDelay(tImage logo, const char *text, uint32_t delay){
+	OLED_Clear();
+
+	ShowIcon(logo);
+	ShowText(text);
+
+	OLED_Refresh();
+
+	SDK_DelayAtLeastUs(delay, SystemCoreClock);
+
+	return;
 }
 
 
