@@ -18,6 +18,8 @@
 #include "SHT30.h"
 #include "RTC_DS1307.h"
 
+#include "Iconos.h"
+
 
 //---------------------------------------------------------------//
 
@@ -60,7 +62,7 @@ void SendDataUART(float inyeccion, float retorno, float saltoTermico, sht30_data
 //void SendDataUART_JSON(float inyeccion, float retorno, float saltoTermico, sht30_data_t data);
 
 
-void SendDataUART_JSON(float inyeccion, float retorno, float saltoTermico, sht30_data_t data, rtc_datetime_t datetime);
+void SendDataUART_JSON(Modo modo, float inyeccion, float retorno, float saltoTermico, sht30_data_t data, rtc_datetime_t datetime);
 
 
 
