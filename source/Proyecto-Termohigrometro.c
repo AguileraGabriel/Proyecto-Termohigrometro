@@ -77,18 +77,8 @@ int main(void){
 	const tImage Copodenieve = { image_data_Copodenieve, 24, 24, 8 };
 	const tImage Sol = { image_data_Sol, 24, 24, 8 };
 	const tImage Termometro = { image_data_Termometro, 24, 24, 8 };
+	const tImage Advertencia = { image_data_Advertencia, 32, 32, 8 };
 	//const tImage UTN = { image_data_UTN, 100, 50, 8 };
-
-
-	//const tImage Cuadrado = { image_data_Cuadrado, 24, 24, 8 };
-
-
-
-
-
-	//startTime =
-
-
 
 	ShowIconAndTextWithDelay(Copodenieve,"Seleccione Modo", 2500000);//con delay
 	ShowIconAndText(Copodenieve,"Modo Refrigeracion");//sin delay
@@ -131,11 +121,31 @@ int main(void){
 			// Leer el resultado del canal 0 (Inyección)
 			if (ADC_GetChannelResult(ADC0, 0, &adcResult0)) {
 				inyeccion = ConvertADCToTemperatureBeta(adcResult0); // Convierte a temperatura
+				while (adcResult0 >= 3900 || adcResult0 <=60){
+					if (adcResult0 >=3900){
+						ShowIconAndText(Advertencia,"CONECTAR INYECCION");//sin delay
+					}else if (adcResult0 <=60){
+						ShowIconAndText(Advertencia,"REEMPLAZAR INYECCION");//sin delay
+					}
+					// Disparar la conversión del ADC
+					ADC_StartConversion(ADC0);
+					ADC_GetChannelResult(ADC0, 0, &adcResult0);
+				}
 			}
 
 			// Leer el resultado del canal 1 (Retorno)
 			if (ADC_GetChannelResult(ADC0, 1, &adcResult1)) {
 				retorno = ConvertADCToTemperatureBeta(adcResult1); // Convierte a temperatura
+				while (adcResult1 >= 3900 || adcResult1 <=60){
+					if (adcResult1 >=3900){
+						ShowIconAndText(Advertencia,"CONECTAR RETORNO");//sin delay
+					}else if (adcResult1 <=60){
+						ShowIconAndText(Advertencia,"REEMPLAZAR RETORNO");//sin delay
+					}
+					// Disparar la conversión del ADC
+					ADC_StartConversion(ADC0);
+					ADC_GetChannelResult(ADC0, 1, &adcResult1);
+				}
 			}
 
 			// Calcular el salto térmico
@@ -145,7 +155,6 @@ int main(void){
 				prendeLEDRef(saltoTermico);
 			}
 			else{ //modo == CALEFACCION
-
 				prendeLEDCal(saltoTermico);
 			}
 		}
@@ -157,10 +166,6 @@ int main(void){
 
 		// Obtener fecha y hora del RTC
 		rtc_datetime_t datetime = GetRTCDateTime();
-		//guardo el currentTime
-		//calculo el elapsedTime = currentTime - startTime
-		//if (elapsedtime %1000)
-
 
 		// Enviar datos por UART en formato JSON
 		if(ultimoTiempo != datetime.seconds){
@@ -169,13 +174,8 @@ int main(void){
 			ultimoTiempo = datetime.seconds;
 		}
 
-		// Enviar datos por UART en formato JSON
-		//SendDataUART_JSON(inyeccion, retorno, saltoTermico, data);
-
-
 		// Actualizar la pantalla OLED con los datos obtenidos
 		//UpdateOLED(modo, inyeccion, retorno, saltoTermico, data); // AGREGAR PRIMER PARAMETRO DE MODO
-
 
 		// Pausa de 250 ms para dar sensación de tiempo real
 		//SDK_DelayAtLeastUs(250000, SystemCoreClock); // 250 ms
