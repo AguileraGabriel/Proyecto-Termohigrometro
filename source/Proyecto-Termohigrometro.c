@@ -78,7 +78,11 @@ int main(void){
 	const tImage Sol = { image_data_Sol, 24, 24, 8 };
 	const tImage Termometro = { image_data_Termometro, 24, 24, 8 };
 	const tImage Advertencia = { image_data_Advertencia, 32, 32, 8 };
-	//const tImage UTN = { image_data_UTN, 100, 50, 8 };
+	const tImage UTN = { image_data_UTNfra, 48, 50, 8 };
+
+	ShowIcon(UTN);
+	OLED_Refresh();
+	SDK_DelayAtLeastUs(2500000, SystemCoreClock);
 
 	ShowIconAndTextWithDelay(Copodenieve,"Seleccione Modo", 2500000);//con delay
 	ShowIconAndText(Copodenieve,"Modo Refrigeracion");//sin delay
@@ -157,6 +161,13 @@ int main(void){
 			else{ //modo == CALEFACCION
 				prendeLEDCal(saltoTermico);
 			}
+		}
+
+
+		if (modo == TERMOHIGROMETRO){
+			GPIO_PinWrite(GPIO, 1, G_LED, 1); //Led Verde ON
+			GPIO_PinWrite(GPIO, 1, R_LED, 1); //Led Rojo OFF
+			GPIO_PinWrite(GPIO, 1, B_LED, 1); //Led Azul OFF
 		}
 
 		// Leer datos del SHT30
