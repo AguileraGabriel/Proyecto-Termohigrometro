@@ -29,6 +29,11 @@
 #define R_25 10000.0      // Resistencia del termistor a 25°C (10kΩ)
 #define T_25 298.15      // Temperatura en Kelvin a 25°C
 
+
+// Constante para calculo de interpolacion
+#define N 13
+
+
 // Estructura para la configuración del ADC
 typedef struct {
     ADC_Type *base;             // Base del periférico ADC
@@ -50,7 +55,19 @@ float ConvertADCToTemperature(uint32_t adcValue);
 
 float ConvertADCToTemperatureBeta(uint32_t adcValue);
 
+/*
+ * Calcula la tabla de diferencias divididas y almacena en el arreglo 'a'
+ * los coeficientes del polinomio en forma de Newton:
+ * a[0] = f[x0], a[1] = f[x0, x1], …, a[N-1] = f[x0, x1, …, x_{N-1}]
+ */
+void computeDividedDifferences(double x[], double y[], double a[], int n);
 
+/*
+ * Evalúa el polinomio de Newton en el punto X.
+ * P(x) = a[0] + a[1]*(x - x[0]) + a[2]*(x - x[0])*(x - x[1]) + ... +
+ *        a[N-1]*(x - x[0])*(x - x[1])*...*(x - x[N-2])
+ */
+double newtonPolynomial(double X, double x[], double a[], int n);
 
 
 //void InitADC_MultiChannel(uint32_t channelMask);

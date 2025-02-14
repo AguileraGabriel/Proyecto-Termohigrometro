@@ -57,6 +57,8 @@ int main(void){
 	Init_PinOut();
 	//Reinicio SHT30 para garantizar funcionamiento del modulo
 	SHT30_SoftReset(I2C1_BASE);
+	//Calculo terminos del polinomio de Newton
+	//computeDividedDifferences(x, y, a, N);
 
 	//Variables requeridas
 	//SHT30
