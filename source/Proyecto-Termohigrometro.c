@@ -22,15 +22,11 @@
  * Variables
  * **************************************/
 
-//char buffer3 [64];
-
 bool menuPrincipalActivo;
 
 Modo modo;
 
 uint8_t ultimoTiempo = 255;
-
-
 
 /*****************************************
  * Code
@@ -44,9 +40,7 @@ int main(void){
 	NVIC_SetPriority(I2C1_IRQn, 3);   		// Baja prioridad para I2C
 	//NVIC_SetPriority(ADC0_SEQA_IRQn, 3);	// Baja prioridad para ADC
 
-
 	//Inicializaciones
-
 	BOARD_InitDebugConsole();
 	//Inicializo I2C
 	I2C_Init();
@@ -64,7 +58,6 @@ int main(void){
 	//Reinicio SHT30 para garantizar funcionamiento del modulo
 	SHT30_SoftReset(I2C1_BASE);
 
-
 	//Variables requeridas
 	//SHT30
 	sht30_data_t data;
@@ -78,13 +71,18 @@ int main(void){
 	const tImage Sol = { image_data_Sol, 24, 24, 8 };
 	const tImage Termometro = { image_data_Termometro, 24, 24, 8 };
 	const tImage Advertencia = { image_data_Advertencia, 32, 32, 8 };
-	const tImage UTN = { image_data_UTNfra, 48, 50, 8 };
+	const tImage UTN = { image_data_UTNfra, 50, 32, 8 };
+	const tImage Logo = { image_data_UTN, 61, 31, 8 };
 
-	ShowIcon(UTN);
+	const tImage Opciones = { image_data_Opciones, 24, 24, 8 };
+
+
+	//ShowIcon(UTN);//Arreglar porque se sigue viendo mal
+	OLED_Draw_Logo(Logo.data, Logo.width, Logo.height, 25, 9);
 	OLED_Refresh();
-	SDK_DelayAtLeastUs(2500000, SystemCoreClock);
+	SDK_DelayAtLeastUs(2000000, SystemCoreClock);
 
-	ShowIconAndTextWithDelay(Copodenieve,"Seleccione Modo", 2500000);//con delay
+	ShowIconAndTextWithDelay(Opciones,"Seleccione Modo", 2000000);//con delay
 	ShowIconAndText(Copodenieve,"Modo Refrigeracion");//sin delay
 
 	while (1) {
@@ -93,8 +91,7 @@ int main(void){
 		if(botonCambioActivo){ //solo entro aca si toco el boton de cambio
 			menuPrincipalActivo = true;
 			modo = ((modo + 1) %3);
-			//pasar el switch a una funcion que reciba modo
-			//imprimirModo(modo)
+
 			switch(modo){
 				case REFRIGERACION:
 					ShowIconAndText(Copodenieve,"Modo Refrigeracion");
@@ -124,7 +121,7 @@ int main(void){
 
 			// Leer el resultado del canal 0 (Inyección)
 			if (ADC_GetChannelResult(ADC0, 0, &adcResult0)) {
-				inyeccion = ConvertADCToTemperatureBeta(adcResult0); // Convierte a temperatura
+				inyeccion = ConvertADCToTemperature(adcResult0); // Convierte a temperatura
 				while (adcResult0 >= 3900 || adcResult0 <=60){
 					if (adcResult0 >=3900){
 						ShowIconAndText(Advertencia,"CONECTAR INYECCION");//sin delay
@@ -156,20 +153,20 @@ int main(void){
 			saltoTermico = retorno - inyeccion;
 
 			if (modo == REFRIGERACION){
-				prendeLEDRef(saltoTermico);
+				//prendeLEDRef(saltoTermico);
 			}
 			else{ //modo == CALEFACCION
-				prendeLEDCal(saltoTermico);
+				//prendeLEDCal(saltoTermico);
 			}
 		}
 
-
+		/*
 		if (modo == TERMOHIGROMETRO){
-			GPIO_PinWrite(GPIO, 1, G_LED, 1); //Led Verde ON
-			GPIO_PinWrite(GPIO, 1, R_LED, 1); //Led Rojo OFF
-			GPIO_PinWrite(GPIO, 1, B_LED, 1); //Led Azul OFF
+			GPIO_PinWrite(GPIO, 0, G_LED, 1); //Led Verde OFF
+			GPIO_PinWrite(GPIO, 0, R_LED, 1); //Led Rojo OFF
+			GPIO_PinWrite(GPIO, 0, B_LED, 1); //Led Azul OFF
 		}
-
+		*/
 		// Leer datos del SHT30
 		if (SHT30_ReadData(I2C1_BASE, &data) == kStatus_Success) {
 			data.dewpoint = SHT30_CalculateDewPoint(data.temperature, data.humidity);
@@ -180,11 +177,15 @@ int main(void){
 
 		// Enviar datos por UART en formato JSON
 		if(ultimoTiempo != datetime.seconds){
-			UpdateOLED(modo, inyeccion, retorno, saltoTermico, data); // AGREGAR PRIMER PARAMETRO DE MODO
+			Init_UART();
+			UpdateOLED(modo, inyeccion, retorno, saltoTermico, data); // AGREGAR PRIMER PARAMETRO DE MODO  adcResult1 cambiar por saltoTermico
 			SendDataUART_JSON(modo, inyeccion, retorno, saltoTermico, data, datetime);// AGREGAR PRIMER PARAMETRO DE MODO		}
 			ultimoTiempo = datetime.seconds;
 		}
 
+		GPIO_PinWrite(GPIO, 0, R_LED, 0);
+		GPIO_PinWrite(GPIO, 0, G_LED, 0);
+		GPIO_PinWrite(GPIO, 0, B_LED, 0);
 		// Actualizar la pantalla OLED con los datos obtenidos
 		//UpdateOLED(modo, inyeccion, retorno, saltoTermico, data); // AGREGAR PRIMER PARAMETRO DE MODO
 
