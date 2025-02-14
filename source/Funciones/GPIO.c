@@ -24,43 +24,43 @@ void Init_PinIn(void){
 // Inicialización de pines para salidas
 void Init_PinOut(void){
 	gpio_pin_config_t out_config = {kGPIO_DigitalOutput, 1};
-	GPIO_PortInit(GPIO, 1);
-	GPIO_PinInit(GPIO, 1, R_LED, &out_config); //LED ROJO
-	GPIO_PinInit(GPIO, 1, G_LED, &out_config); //LED VERDE
-	GPIO_PinInit(GPIO, 1, B_LED, &out_config); //LED AZUL
+	GPIO_PortInit(GPIO, 0);
+	GPIO_PinInit(GPIO, 0, R_LED, &out_config); //LED ROJO
+	GPIO_PinInit(GPIO, 0, G_LED, &out_config); //LED VERDE
+	GPIO_PinInit(GPIO, 0, B_LED, &out_config); //LED AZUL
 	return;
 }
 
 void prendeLEDRef(float saltoTermico){
 	if(saltoTermico>=8){
-		GPIO_PinWrite(GPIO, 1, G_LED, 0); //Led Verde ON
-		GPIO_PinWrite(GPIO, 1, R_LED, 1); //Led Rojo OFF
-		GPIO_PinWrite(GPIO, 1, B_LED, 1); //Led Azul OFF
+		GPIO_PinWrite(GPIO, 0, G_LED, 0); //Led Verde ON
+		GPIO_PinWrite(GPIO, 0, R_LED, 1); //Led Rojo OFF
+		GPIO_PinWrite(GPIO, 0, B_LED, 1); //Led Azul OFF
 	}else if(saltoTermico<=4){
-		GPIO_PinWrite(GPIO, 1, G_LED, 1); //Led Verde OFF
-		GPIO_PinWrite(GPIO, 1, R_LED, 0); //Led Rojo ON
-		GPIO_PinWrite(GPIO, 1, B_LED, 1); //Led Azul OFF
+		GPIO_PinWrite(GPIO, 0, G_LED, 1); //Led Verde OFF
+		GPIO_PinWrite(GPIO, 0, R_LED, 0); //Led Rojo ON
+		GPIO_PinWrite(GPIO, 0, B_LED, 1); //Led Azul OFF
 	}else{
-		GPIO_PinWrite(GPIO, 1, G_LED, 1); //Led Verde OFF
-		GPIO_PinWrite(GPIO, 1, R_LED, 1); //Led Rojo OFF
-		GPIO_PinWrite(GPIO, 1, B_LED, 0); //Led Azul ON
+		GPIO_PinWrite(GPIO, 0, G_LED, 1); //Led Verde OFF
+		GPIO_PinWrite(GPIO, 0, R_LED, 1); //Led Rojo OFF
+		GPIO_PinWrite(GPIO, 0, B_LED, 0); //Led Azul ON
 	}
 	return;
 }
 
 void prendeLEDCal(float saltoTermico){
 	if(saltoTermico>=14){
-		GPIO_PinWrite(GPIO, 1, G_LED, 0); //Led Verde ON
-		GPIO_PinWrite(GPIO, 1, R_LED, 1); //Led Rojo OFF
-		GPIO_PinWrite(GPIO, 1, B_LED, 1); //Led Azul OFF
+		GPIO_PinWrite(GPIO, 0, G_LED, 0); //Led Verde ON
+		GPIO_PinWrite(GPIO, 0, R_LED, 1); //Led Rojo OFF
+		GPIO_PinWrite(GPIO, 0, B_LED, 1); //Led Azul OFF
 	}else if(saltoTermico<=7){
-		GPIO_PinWrite(GPIO, 1, G_LED, 1); //Led Verde OFF
-		GPIO_PinWrite(GPIO, 1, R_LED, 0); //Led Rojo ON
-		GPIO_PinWrite(GPIO, 1, B_LED, 1); //Led Azul OFF
+		GPIO_PinWrite(GPIO, 0, G_LED, 1); //Led Verde OFF
+		GPIO_PinWrite(GPIO, 0, R_LED, 0); //Led Rojo ON
+		GPIO_PinWrite(GPIO, 0, B_LED, 1); //Led Azul OFF
 	}else{
-		GPIO_PinWrite(GPIO, 1, G_LED, 1); //Led Verde OFF
-		GPIO_PinWrite(GPIO, 1, R_LED, 1); //Led Rojo OFF
-		GPIO_PinWrite(GPIO, 1, B_LED, 0); //Led Azul ON
+		GPIO_PinWrite(GPIO, 0, G_LED, 1); //Led Verde OFF
+		GPIO_PinWrite(GPIO, 0, R_LED, 1); //Led Rojo OFF
+		GPIO_PinWrite(GPIO, 0, B_LED, 0); //Led Azul ON
 	}
 	return;
 }
