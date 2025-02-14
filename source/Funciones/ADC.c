@@ -73,8 +73,8 @@ void InitADC(uint32_t channelMask) {
 
 // Convierte el valor del ADC a temperatura en Celsius
 float ConvertADCToTemperature(uint32_t adcValue) {
-    float voltage = (float)adcValue * V_REF / 4095.0; // Conversión ADC a voltaje (12 bits)
-    float rThermistor = R_REF * voltage / (V_REF - voltage); // Resistencia del termistor
+    float voltage = ((float)adcValue * V_REF / 4095.0); // Conversión ADC a voltaje (12 bits)
+    float rThermistor = R_REF * ((V_REF/(voltage) - 1)); // Resistencia del termistor
 
     // Evitar divisiones por cero o valores inválidos
     if (rThermistor <= 0) {
@@ -83,16 +83,21 @@ float ConvertADCToTemperature(uint32_t adcValue) {
 
     // Ecuación de Steinhart-Hart
     float logR = log(rThermistor); // ln(R)
-    float tempKelvin = 1.0 / (A + B * logR + C * logR * logR * logR); // Kelvin
+    float terminoB = B * logR;
+    float terminoC = C * logR * logR * logR;
+    float tempKelvin = 1.0 / (A + terminoB + terminoC); // Kelvin
+
+    //float tempKelvin = 1.0 / (A + B * logR + C * logR * logR * logR); // Kelvin
     float tempCelsius = tempKelvin - 273.15; // Convertir a Celsius
+
 
     return tempCelsius;
 }
 
 // Convierte el valor del ADC a temperatura en Celsius usando la ecuación β
 float ConvertADCToTemperatureBeta(uint32_t adcValue) {
-    float voltage = (float)adcValue * V_REF / 4095.0; // Conversión ADC a voltaje (12 bits)
-    float rThermistor = R_REF * voltage / (V_REF - voltage); // Resistencia del termistor
+    float voltage = ((float)adcValue * V_REF / 4095.0); // Conversión ADC a voltaje (12 bits)
+    float rThermistor = R_REF * ((V_REF/(voltage ))- 1); // Resistencia del termistor
 
     // Evitar divisiones por cero o valores inválidos
     if (rThermistor <= 0) {
@@ -102,6 +107,7 @@ float ConvertADCToTemperatureBeta(uint32_t adcValue) {
     // Ecuación paramétrica de β
     float tempKelvin = BETA / (log(rThermistor / R_25) + (BETA / T_25)); // Temperatura en Kelvin
     float tempCelsius = tempKelvin - 273.15; // Convertir a Celsius
+
 
     return tempCelsius;
 }

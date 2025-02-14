@@ -17,16 +17,16 @@
 
 
 // Constantes para el termistor (ajusta según tu hoja de datos)
-#define A 0.001129148 // Constante A de Steinhart-Hart
-#define B 0.000234125 // Constante B de Steinhart-Hart
-#define C 0.0000000876741 // Constante C de Steinhart-Hart
-#define R_REF 5000.0      // Resistencia de referencia (5kΩ)
+#define A 0.000144 // Constante A de Steinhart-Hart
+#define B 0.0004119 // Constante B de Steinhart-Hart
+#define C -0.000000746 // Constante C de Steinhart-Hart
+#define R_REF 10000.0      // Resistencia de referencia (10kΩ)
 #define V_REF 3.3         // Voltaje de referencia del divisor (3.3V)
 
 // Constantes del termistor
 //#define BETA 3950.0      // Valor típico del coeficiente beta (ajusta según el termistor)
-#define BETA 15000.0      // Valor típico del coeficiente beta (ajusta según el termistor)
-#define R_25 5000.0      // Resistencia del termistor a 25°C (5kΩ)
+#define BETA 4466.45      // Valor típico del coeficiente beta (ajusta según el termistor) 12750.0
+#define R_25 10000.0      // Resistencia del termistor a 25°C (10kΩ)
 #define T_25 298.15      // Temperatura en Kelvin a 25°C
 
 // Estructura para la configuración del ADC
