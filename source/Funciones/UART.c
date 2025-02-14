@@ -58,7 +58,7 @@ void Init_UART(void){
 	NVIC_EnableIRQ(USART1_IRQn);
 
 	//Escribo para verificar la conexión
-	USART_WriteByte(USART1, 0x31);
+	//USART_WriteByte(USART1, 0x31);
 	return;
 }
 
@@ -143,9 +143,9 @@ void SendDataUART_JSON(float inyeccion, float retorno, float saltoTermico, sht30
 void SendDataUART_JSON(Modo modo, float inyeccion, float retorno, float saltoTermico, sht30_data_t data, rtc_datetime_t datetime) {
     // Generar mensaje JSON directamente con los valores flotantes y fecha/hora
     sprintf(bufferUART,
-            "{ \"modo\": %i, \"inyeccion\": %.2f, \"retorno\": %.2f, \"saltoTermico\": %.2f, \"tempRef\": %.2f, \"humRef\": %d, \"dewPoint\": %.2f, "
+            "{ \"modo\": %i, \"inyeccion\": %.2f, \"retorno\": %.2f, \"saltoTermico\": %.2f, \"tempRef\": %.2f, \"humRef\": %.2f, \"dewPoint\": %.2f, "
             "\"date\": \"%02d/%02d/%02d\", \"time\": \"%02d:%02d:%02d\" }\r\n",
-            modo, inyeccion, retorno, saltoTermico, data.temperature, (int)data.humidity, data.dewpoint,
+            modo, inyeccion, retorno, saltoTermico, data.temperature, data.humidity, data.dewpoint,
             datetime.day, datetime.month, datetime.year, datetime.hours, datetime.minutes, datetime.seconds);
 
     // Enviar el mensaje por UART
