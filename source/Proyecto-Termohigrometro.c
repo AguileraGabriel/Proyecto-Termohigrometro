@@ -6,6 +6,7 @@
 #include "Cabecera/GPIO.h"
 #include "Cabecera/SHT30.h"
 #include "Cabecera/UART.h"
+#include "Cabecera/ADC_Correction.h"
 
 #include "fsl_debug_console.h"
 #include "board.h"
@@ -58,7 +59,7 @@ int main(void){
 	//Reinicio SHT30 para garantizar funcionamiento del modulo
 	SHT30_SoftReset(I2C1_BASE);
 	//Calculo terminos del polinomio de Newton
-	//computeDividedDifferences(x, y, a, N);
+	ADC_Correction_Init();
 
 	//Variables requeridas
 	//SHT30
@@ -73,7 +74,6 @@ int main(void){
 	const tImage Sol = { image_data_Sol, 24, 24, 8 };
 	const tImage Termometro = { image_data_Termometro, 24, 24, 8 };
 	const tImage Advertencia = { image_data_Advertencia, 32, 32, 8 };
-	const tImage UTN = { image_data_UTNfra, 50, 32, 8 };
 	const tImage Logo = { image_data_UTN, 61, 31, 8 };
 
 	const tImage Opciones = { image_data_Opciones, 24, 24, 8 };
@@ -124,6 +124,7 @@ int main(void){
 			// Leer el resultado del canal 0 (Inyección)
 			if (ADC_GetChannelResult(ADC0, 0, &adcResult0)) {
 				inyeccion = ConvertADCToTemperature(adcResult0); // Convierte a temperatura
+				//Verifico rango de temperatura y termistor defectuoso o faltante
 				while (adcResult0 >= 3900 || adcResult0 <=60){
 					if (adcResult0 >=3900){
 						ShowIconAndText(Advertencia,"CONECTAR INYECCION");//sin delay
@@ -138,7 +139,8 @@ int main(void){
 
 			// Leer el resultado del canal 1 (Retorno)
 			if (ADC_GetChannelResult(ADC0, 1, &adcResult1)) {
-				retorno = ConvertADCToTemperatureBeta(adcResult1); // Convierte a temperatura
+				retorno = ConvertADCToTemperature(adcResult1); // Convierte a temperatura
+				//Verifico rango de temperatura y termistor defectuoso o faltante
 				while (adcResult1 >= 3900 || adcResult1 <=60){
 					if (adcResult1 >=3900){
 						ShowIconAndText(Advertencia,"CONECTAR RETORNO");//sin delay
@@ -155,20 +157,21 @@ int main(void){
 			saltoTermico = retorno - inyeccion;
 
 			if (modo == REFRIGERACION){
-				//prendeLEDRef(saltoTermico);
+				saltoTermico = retorno - inyeccion;
+				prendeLEDRef(saltoTermico);
 			}
 			else{ //modo == CALEFACCION
-				//prendeLEDCal(saltoTermico);
+				saltoTermico = inyeccion - retorno;
+				prendeLEDCal(saltoTermico);
 			}
 		}
 
-		/*
 		if (modo == TERMOHIGROMETRO){
 			GPIO_PinWrite(GPIO, 0, G_LED, 1); //Led Verde OFF
 			GPIO_PinWrite(GPIO, 0, R_LED, 1); //Led Rojo OFF
 			GPIO_PinWrite(GPIO, 0, B_LED, 1); //Led Azul OFF
 		}
-		*/
+
 		// Leer datos del SHT30
 		if (SHT30_ReadData(I2C1_BASE, &data) == kStatus_Success) {
 			data.dewpoint = SHT30_CalculateDewPoint(data.temperature, data.humidity);
@@ -179,15 +182,11 @@ int main(void){
 
 		// Enviar datos por UART en formato JSON
 		if(ultimoTiempo != datetime.seconds){
-			Init_UART();
-			UpdateOLED(modo, inyeccion, retorno, saltoTermico, data); // AGREGAR PRIMER PARAMETRO DE MODO  adcResult1 cambiar por saltoTermico
-			SendDataUART_JSON(modo, inyeccion, retorno, saltoTermico, data, datetime);// AGREGAR PRIMER PARAMETRO DE MODO		}
+			UpdateOLED(modo, inyeccion, retorno, saltoTermico, data);
+			SendDataUART_JSON(modo, inyeccion, retorno, saltoTermico, data, datetime);
 			ultimoTiempo = datetime.seconds;
 		}
 
-		GPIO_PinWrite(GPIO, 0, R_LED, 0);
-		GPIO_PinWrite(GPIO, 0, G_LED, 0);
-		GPIO_PinWrite(GPIO, 0, B_LED, 0);
 		// Actualizar la pantalla OLED con los datos obtenidos
 		//UpdateOLED(modo, inyeccion, retorno, saltoTermico, data); // AGREGAR PRIMER PARAMETRO DE MODO
 

@@ -5,21 +5,7 @@
  */
 
 #include "../Cabecera/ADC.h"
-
-// Conjunto de 13 puntos (los nodos x y los valores f(x))
-double x[N] = {
-    1898.591, 1980.0, 2059.909, 2196.409, 2394.955,
-    2556.273, 2655.545, 2779.636, 2965.773, 3139.500,
-    3251.182, 3338.045, 3412.500
-};
-
-double y[N] = {
-    1355.661, 1450.0, 1544.700, 1815.428, 2072.718,
-    2276.686, 2467.859, 2627.246, 2836.527, 2982.520,
-    3121.189, 3218.496, 3317.580
-};
-
-double a[N];
+#include "../Cabecera/ADC_Correction.h"
 
 
 
@@ -27,7 +13,6 @@ double a[N];
 void ADC_StartConversion(ADC_Type *base) {
     ADC_DoSoftwareTriggerConvSeqA(base);
 }
-
 
 
 // Obtiene el resultado del canal especificado (no bloqueante)
@@ -43,11 +28,6 @@ bool ADC_GetChannelResult(ADC_Type *base, uint32_t channel, uint32_t *result) {
     }
     return false; // No hay resultado disponible
 }
-
-
-
-
-
 
 
 // Inicialización del ADC
@@ -89,9 +69,8 @@ void InitADC(uint32_t channelMask) {
 
 // Convierte el valor del ADC a temperatura en Celsius
 float ConvertADCToTemperature(uint32_t adcValue) {
-	computeDividedDifferences(x, y, a, N);
-    float adcValueCorregido = newtonPolynomial((double)adcValue, x, a, N);;
-	float voltage = ((float)adcValueCorregido * V_REF / 4095.0); // Conversión ADC a voltaje (12 bits)
+    float adcValueCorregido = ADC_Correction_Apply((double)adcValue);;
+	float voltage = (adcValueCorregido * V_REF / 4095.0); // Conversión ADC a voltaje (12 bits)
     float rThermistor = R_REF * ((V_REF/(voltage) - 1)); // Resistencia del termistor
 
     // Evitar divisiones por cero o valores inválidos
@@ -135,36 +114,4 @@ float ConvertADCToTemperatureBeta(uint32_t adcValue) {
  * los coeficientes del polinomio en forma de Newton:
  * a[0] = f[x0], a[1] = f[x0, x1], …, a[N-1] = f[x0, x1, …, x_{N-1}]
  */
-void computeDividedDifferences(double x[], double y[], double a[], int n) {
-    double table[N][N];
-    // Inicializamos la primera columna con los valores de y
-    for (int i = 0; i < n; i++) {
-        table[i][0] = y[i];
-    }
-    // Calculamos las diferencias divididas de orden j
-    for (int j = 1; j < n; j++) {
-        for (int i = 0; i < n - j; i++) {
-            table[i][j] = (table[i+1][j-1] - table[i][j-1]) / (x[i+j] - x[i]);
-        }
-    }
-    // Los coeficientes son la primera fila de la tabla
-    for (int i = 0; i < n; i++) {
-        a[i] = table[0][i];
-    }
-}
-
-/*
- * Evalúa el polinomio de Newton en el punto X.
- * P(x) = a[0] + a[1]*(x - x[0]) + a[2]*(x - x[0])*(x - x[1]) + ... +
- *        a[N-1]*(x - x[0])*(x - x[1])*...*(x - x[N-2])
- */
-double newtonPolynomial(double X, double x[], double a[], int n) {
-    double result = a[0];
-    double term = 1.0;
-    for (int i = 1; i < n; i++) {
-        term *= (X - x[i-1]);
-        result += a[i] * term;
-    }
-    return result;
-}
 

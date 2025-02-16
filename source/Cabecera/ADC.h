@@ -17,9 +17,9 @@
 
 
 // Constantes para el termistor (ajusta según tu hoja de datos)
-#define A 0.000144 // Constante A de Steinhart-Hart
-#define B 0.0004119 // Constante B de Steinhart-Hart
-#define C -0.000000746 // Constante C de Steinhart-Hart
+#define A 0.913588e-3 // Constante A de Steinhart-Hart
+#define B 2.681619e-4 // Constante B de Steinhart-Hart
+#define C -0.37674e-7 // Constante C de Steinhart-Hart
 #define R_REF 10000.0      // Resistencia de referencia (10kΩ)
 #define V_REF 3.3         // Voltaje de referencia del divisor (3.3V)
 
@@ -54,20 +54,6 @@ bool ADC_GetChannelResult(ADC_Type *base, uint32_t channel, uint32_t *result);
 float ConvertADCToTemperature(uint32_t adcValue);
 
 float ConvertADCToTemperatureBeta(uint32_t adcValue);
-
-/*
- * Calcula la tabla de diferencias divididas y almacena en el arreglo 'a'
- * los coeficientes del polinomio en forma de Newton:
- * a[0] = f[x0], a[1] = f[x0, x1], …, a[N-1] = f[x0, x1, …, x_{N-1}]
- */
-void computeDividedDifferences(double x[], double y[], double a[], int n);
-
-/*
- * Evalúa el polinomio de Newton en el punto X.
- * P(x) = a[0] + a[1]*(x - x[0]) + a[2]*(x - x[0])*(x - x[1]) + ... +
- *        a[N-1]*(x - x[0])*(x - x[1])*...*(x - x[N-2])
- */
-double newtonPolynomial(double X, double x[], double a[], int n);
 
 
 //void InitADC_MultiChannel(uint32_t channelMask);
