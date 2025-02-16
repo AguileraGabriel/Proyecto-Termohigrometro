@@ -58,8 +58,6 @@ int main(void){
 	Init_PinOut();
 	//Reinicio SHT30 para garantizar funcionamiento del modulo
 	SHT30_SoftReset(I2C1_BASE);
-	//Calculo terminos del polinomio de Newton
-
 
 	//Variables requeridas
 	//SHT30
@@ -75,7 +73,6 @@ int main(void){
 	const tImage Termometro = { image_data_Termometro, 24, 24, 8 };
 	const tImage Advertencia = { image_data_Advertencia, 32, 32, 8 };
 	const tImage Logo = { image_data_UTN, 61, 31, 8 };
-
 	const tImage Opciones = { image_data_Opciones, 24, 24, 8 };
 
 
@@ -168,7 +165,7 @@ int main(void){
 		if (modo == TERMOHIGROMETRO){
 			GPIO_PinWrite(GPIO, 0, G_LED, 1); //Led Verde OFF
 			GPIO_PinWrite(GPIO, 0, R_LED, 1); //Led Rojo OFF
-			GPIO_PinWrite(GPIO, 0, B_LED, 1); //Led Azul OFF
+			GPIO_PinWrite(GPIO, 0, Y_LED, 1); //Led Azul OFF
 		}
 
 		// Leer datos del SHT30
@@ -186,11 +183,7 @@ int main(void){
 			ultimoTiempo = datetime.seconds;
 		}
 
-		// Actualizar la pantalla OLED con los datos obtenidos
-		//UpdateOLED(modo, inyeccion, retorno, saltoTermico, data); // AGREGAR PRIMER PARAMETRO DE MODO
 
-		// Pausa de 250 ms para dar sensación de tiempo real
-		//SDK_DelayAtLeastUs(250000, SystemCoreClock); // 250 ms
 	}
 }
 

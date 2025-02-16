@@ -22,9 +22,9 @@
 #define Switch_3 30 //Pulsador en PIN 16
 
 
-#define R_LED 29 //LED Rojo Board
-#define G_LED 8 //LED Verde Board
-#define B_LED 9 //LED Azul Board
+#define G_LED 29 //LED Rojo Board
+#define R_LED 8 //LED Verde Board
+#define Y_LED 9 //LED Azul Board
 
 #define LED_ON 0
 #define LED_OFF 1
