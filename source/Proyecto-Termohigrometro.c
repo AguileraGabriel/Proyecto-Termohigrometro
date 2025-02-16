@@ -59,7 +59,7 @@ int main(void){
 	//Reinicio SHT30 para garantizar funcionamiento del modulo
 	SHT30_SoftReset(I2C1_BASE);
 	//Calculo terminos del polinomio de Newton
-	ADC_Correction_Init();
+
 
 	//Variables requeridas
 	//SHT30
@@ -153,8 +153,7 @@ int main(void){
 				}
 			}
 
-			// Calcular el salto térmico
-			saltoTermico = retorno - inyeccion;
+
 
 			if (modo == REFRIGERACION){
 				saltoTermico = retorno - inyeccion;
