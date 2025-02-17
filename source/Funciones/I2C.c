@@ -17,8 +17,8 @@ void I2C_Init(void) {
 
     CLOCK_Select(kI2C1_Clk_From_MainClk);
     CLOCK_EnableClock(kCLOCK_Swm);
-    SWM_SetMovablePinSelect(SWM0, kSWM_I2C1_SDA, kSWM_PortPin_P0_27); // Pin 13
-    SWM_SetMovablePinSelect(SWM0, kSWM_I2C1_SCL, kSWM_PortPin_P0_26); // Pin 12
+    SWM_SetMovablePinSelect(SWM0, kSWM_I2C1_SDA, kSWM_PortPin_P0_26); // Pin 13
+    SWM_SetMovablePinSelect(SWM0, kSWM_I2C1_SCL, kSWM_PortPin_P0_27); // Pin 12
     CLOCK_DisableClock(kCLOCK_Swm);
 
     i2c_master_config_t masterConfig;

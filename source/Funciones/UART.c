@@ -14,7 +14,7 @@ uint8_t flagReceived = 0, dataUsart;
 
 char buffer[64]; //Buffer donde cargo la informacion a enviar por USART.
 char newline []="\r\n"; //Buffer para realizar un salto de linea.
-char bufferUART[128];
+char bufferUART[256];
 
 
 /*
@@ -58,7 +58,7 @@ void Init_UART(void){
 	NVIC_EnableIRQ(USART1_IRQn);
 
 	//Escribo para verificar la conexión
-	USART_WriteByte(USART1, 0x31);
+	//USART_WriteByte(USART1, 0x31);
 	return;
 }
 
@@ -95,6 +95,8 @@ void UART_WriteString(USART_Type *base, const char *data) {
 /***************************
  * Propias del Proyecto
  * *************************/
+
+//Envio por UART todos mis valores
 void SendDataUART(float inyeccion, float retorno, float saltoTermico, sht30_data_t data) {
     // Enviar temperatura de Inyección (Termistor 1)
     sprintf(bufferUART, "Inyeccion: %0.2f C\r\n", inyeccion);
@@ -124,6 +126,31 @@ void SendDataUART(float inyeccion, float retorno, float saltoTermico, sht30_data
     UART_WriteString(USART1, "\r\n");
 }
 
+/*
+//Envio mis datos en formato JSON
+void SendDataUART_JSON(float inyeccion, float retorno, float saltoTermico, sht30_data_t data) {
+    // Generar mensaje JSON directamente con los valores flotantes
+    sprintf(bufferUART,
+            "{ \"inyeccion\": %.2f, \"retorno\": %.2f, \"saltoTermico\": %.2f, \"tempRef\": %.2f, \"humRef\": %d, \"dewPoint\": %.2f }\r\n",
+            inyeccion, retorno, saltoTermico, data.temperature, (int)data.humidity, data.dewpoint);
+
+    // Enviar el mensaje por UART
+    UART_WriteString(USART1, bufferUART);
+}
+*/
+
+
+void SendDataUART_JSON(Modo modo, float inyeccion, float retorno, float saltoTermico, sht30_data_t data, rtc_datetime_t datetime) {
+    // Generar mensaje JSON directamente con los valores flotantes y fecha/hora
+    sprintf(bufferUART,
+            "{ \"modo\": %i, \"inyeccion\": %.2f, \"retorno\": %.2f, \"saltoTermico\": %.2f, \"tempRef\": %.2f, \"humRef\": %.2f, \"dewPoint\": %.2f, "
+            "\"date\": \"%02d/%02d/%02d\", \"time\": \"%02d:%02d:%02d\" }\r\n",
+            modo, inyeccion, retorno, saltoTermico, data.temperature, data.humidity, data.dewpoint,
+            datetime.day, datetime.month, datetime.year, datetime.hours, datetime.minutes, datetime.seconds);
+
+    // Enviar el mensaje por UART
+    UART_WriteString(USART1, bufferUART);
+}
 
 
 

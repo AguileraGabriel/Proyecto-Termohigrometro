@@ -9,7 +9,18 @@
 #define CABECERA_RTC_DS1307_H_
 
 
-#define DS1307_I2C_ADDRESS		0X63
+#define DS1307_I2C_ADDRESS		0X68
+
+
+typedef struct {
+    uint8_t day;
+    uint8_t month;
+    uint8_t year;
+    uint8_t hours;
+    uint8_t minutes;
+    uint8_t seconds;
+} rtc_datetime_t;
+
 /*--------------------------------------
  * Conversion Functions
  *--------------------------------------*/
@@ -98,5 +109,9 @@ status_t DS1307_GetDate(uint8_t *day, uint8_t *month, uint8_t *year);
  *
  */
 void setCurrentTime(void);
+
+
+rtc_datetime_t GetRTCDateTime(void);
+
 
 #endif /* CABECERA_RTC_DS1307_H_ */
