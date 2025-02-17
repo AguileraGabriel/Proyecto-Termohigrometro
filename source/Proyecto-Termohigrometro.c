@@ -39,7 +39,7 @@ int main(void){
 
 	NVIC_SetPriority(USART1_IRQn, 1);		// Alta prioridad para UART
 	NVIC_SetPriority(I2C1_IRQn, 3);   		// Baja prioridad para I2C
-	//NVIC_SetPriority(ADC0_SEQA_IRQn, 3);	// Baja prioridad para ADC
+
 
 	//Inicializaciones
 	BOARD_InitDebugConsole();
