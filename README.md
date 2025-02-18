@@ -1,4 +1,4 @@
-# Herramienta de Medición de Salto Térmico
+# Termohigrometro con medida diferencial de temperatura aplicable al campo de la refrigeración
 
 Este proyecto consiste en el desarrollo de una herramienta capaz de obtener información diferencial de la temperatura, manteniendo una temperatura y humedad de referencia. La información se muestra tanto en una pantalla integrada del dispositivo como en una computadora mediante comunicación UART.
 
