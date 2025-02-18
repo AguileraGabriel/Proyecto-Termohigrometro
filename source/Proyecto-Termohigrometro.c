@@ -76,8 +76,7 @@ int main(void){
 	const tImage Opciones = { image_data_Opciones, 24, 24, 8 };
 
 
-	//ShowIcon(UTN);//Arreglar porque se sigue viendo mal
-	OLED_Draw_Logo(Logo.data, Logo.width, Logo.height, 25, 9);
+	OLED_Draw_Logo(Logo.data, Logo.width, Logo.height, 33.5, 16.5);
 	OLED_Refresh();
 	SDK_DelayAtLeastUs(2000000, SystemCoreClock);
 
@@ -122,11 +121,11 @@ int main(void){
 			if (ADC_GetChannelResult(ADC0, 0, &adcResult0)) {
 				inyeccion = ConvertADCToTemperature(adcResult0); // Convierte a temperatura
 				//Verifico rango de temperatura y termistor defectuoso o faltante
-				while (adcResult0 >= 3900 || adcResult0 <=60){
+				while (adcResult0 >= 3900 || adcResult0 <=800){
 					if (adcResult0 >=3900){
-						ShowIconAndText(Advertencia,"CONECTAR INYECCION");//sin delay
-					}else if (adcResult0 <=60){
 						ShowIconAndText(Advertencia,"REEMPLAZAR INYECCION");//sin delay
+					}else if (adcResult0 <=800){
+						ShowIconAndText(Advertencia,"CONECTAR INYECCION");//sin delay
 					}
 					// Disparar la conversión del ADC
 					ADC_StartConversion(ADC0);
@@ -138,11 +137,11 @@ int main(void){
 			if (ADC_GetChannelResult(ADC0, 1, &adcResult1)) {
 				retorno = ConvertADCToTemperature(adcResult1); // Convierte a temperatura
 				//Verifico rango de temperatura y termistor defectuoso o faltante
-				while (adcResult1 >= 3900 || adcResult1 <=60){
+				while (adcResult1 >= 3900 || adcResult1 <=800){
 					if (adcResult1 >=3900){
-						ShowIconAndText(Advertencia,"CONECTAR RETORNO");//sin delay
-					}else if (adcResult1 <=60){
 						ShowIconAndText(Advertencia,"REEMPLAZAR RETORNO");//sin delay
+					}else if (adcResult1 <=800){
+						ShowIconAndText(Advertencia,"CONECTAR RETORNO");//sin delay
 					}
 					// Disparar la conversión del ADC
 					ADC_StartConversion(ADC0);
